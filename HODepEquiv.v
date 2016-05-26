@@ -29,7 +29,7 @@ Definition lift2 {A A'} {B: A -> A' -> Type} {C: A -> A' -> Type} {D : A -> A' -
 
 (** ** Domain transformation: *)
 
-Instance HODepEquiv_easy A (B: A -> Type) (C:HSet) (C': HSet)
+Instance HODepEquiv_easy A (B: A -> Type) C {HC : IsHSet C} C' {HC' : IsHSet C'}
            (H:B ≈ C) 
    : (forall a, B a ⇀ C')  ≃? (C ⇀ C')  | 0
   :=
@@ -78,8 +78,8 @@ Defined.
 
 (** ** Domain & co-domain transformation: *)
 
-Instance HODepEquiv {A} {B: A -> Type} {C} 
-           `{B ≈ C} {B': A -> Type} {C'} 
+Instance HODepEquiv {A} {B: A -> Type} {C} {HC : IsHSet C}
+           `{B ≈ C} {B': A -> Type} {C'} {HC' : IsHSet C'}
            `{B' ≈ C'} 
   : (forall a, B a ⇀ (B' a))  ≃? (C ⇀ C'):=
   {| pe_fun := Build_Mon (fun f => to_simpl_dom (fun a b => x <- f a b;  to_simpl x)) _ _ ; 
@@ -139,7 +139,8 @@ Defined.
   
 (** ** Argument reordering: *)
 
-Instance HODepEquiv2_sym A A' B_1 B_2 (B_3 : A -> A' -> Type) {C_1 C_2 C_3 : HSet}
+Instance HODepEquiv2_sym A A' B_1 B_2 (B_3 : A -> A' -> Type) {C_1 C_2 C_3}
+         {HC_1 : IsHSet C_1} {HC_2 : IsHSet C_2} {HC_3 : IsHSet C_3}
          (H: (forall a a', B_2 a a' -> B_1 a a' ⇀ B_3 a a') ≃? (C_2 -> C_1 ⇀ C_3)) :
   (forall a a', B_1 a a' -> B_2 a a' ⇀ B_3 a a') ≃? (C_1 -> C_2 ⇀ C_3) | 100
     :=
@@ -173,15 +174,17 @@ Defined.
 Hint Extern 1 (IsPartialEquiv ?f) => apply (pe_isequiv (CanonicalPartialEquiv := _)) :
              typeclass_instances.
 
-Definition to_simpl_dom2 {A A' B_1 B_2} {B_3 : A -> A' -> Type} {C_1 C_2 C_3 : HSet}
+Definition to_simpl_dom2 {A A' B_1 B_2} {B_3 : A -> A' -> Type} {C_1 C_2 C_3}
+           {HC_1 : IsHSet C_1} {HC_2 : IsHSet C_2} {HC_3 : IsHSet C_3}
            `{forall a, ((forall a':A', B_2 a a' ⇀ B_3 a a')  ≃? (C_2 ⇀ C_3))}
            `{DepEquiv A B_1 C_1}:
          (∀ a a', B_1 a → B_2 a a' ⇀ B_3 a a') → C_1 → C_2 ⇀ C_3 :=
   fun f => let f' := fun a b => pe_fun (fun a' => f a a' b) in 
         fun b_ c => to_simpl_dom (fun a b => f' a b c) b_.
 
-Definition to_dep_dom2 {A A' B_1 B_2} {B_3 : A -> A' -> Type} {C_1 C_2 C_3 : HSet}
-         `{forall a, ((forall a':A', B_2 a a' ⇀ B_3 a a')  ≃? (C_2 ⇀ C_3))} `{DepEquiv A B_1 C_1}:
+Definition to_dep_dom2 {A A' B_1 B_2} {B_3 : A -> A' -> Type} {C_1 C_2 C_3 }
+           {HC_1 : IsHSet C_1} {HC_2 : IsHSet C_2} {HC_3 : IsHSet C_3}
+           `{forall a, ((forall a':A', B_2 a a' ⇀ B_3 a a')  ≃? (C_2 ⇀ C_3))} `{DepEquiv A B_1 C_1}:
          (C_1 → C_2 ⇀ C_3) -> ∀ a a', B_1 a → B_2 a a' ⇀ B_3 a a' :=
   fun f a a' b c =>
     pe_inv (IsPartialEquiv := pe_isequiv (CanonicalPartialEquiv := H a))
@@ -189,7 +192,8 @@ Definition to_dep_dom2 {A A' B_1 B_2} {B_3 : A -> A' -> Type} {C_1 C_2 C_3 : HSe
 
 Instance HODepEquiv2
          A A' (B_1: A -> Type) (B_2: A -> A' -> Type) (B_3 : A -> A' -> Type)
-         (C_1 C_2 C_3 : HSet)
+         C_1 C_2 C_3
+         {HC_1 : IsHSet C_1} {HC_2 : IsHSet C_2} {HC_3 : IsHSet C_3}
          (H:forall a, ((forall a':A', B_2 a a' ⇀ B_3 a a')  ≃? (C_2 ⇀ C_3))) `{DepEquiv A B_1 C_1} :
   (forall a a', B_1 a -> B_2 a a' ⇀ B_3 a a') ≃? (C_1 -> C_2 ⇀ C_3)
   :=
@@ -213,7 +217,7 @@ Proof.
   + cbn. unfold to_dep_dom2, to_simpl_dom. intros a a' b c.
     destruct (to_simpl b) as[s | s]; simpl; try apply fail_contr; auto.
     apply (pe_inv (IsPartialEquiv := pe_isequiv (CanonicalPartialEquiv := H a)) .(p_mon _ _) a' c).
-    assert ((λ _ : C_2, Fail C_3 s) = (λ _ : C_2, Fail C_3 (Cast_info_wrap "cast" C_3))).
+    assert ((λ _ : C_2, Fail C_3 s) = (λ _ : C_2, Fail C_3 (Cast_info_wrap "cast"))).
     apply FunExt. intro. apply ap. apply is_hprop.
     rewrite H1. apply (pe_inv (IsPartialEquiv := pe_isequiv (CanonicalPartialEquiv := H a)) .(p_mon _ _) a' c).
   + intros ff a a' b c.
@@ -234,10 +238,10 @@ pose (pek_sect (IsPartialEquivK := pek_isequiv (p := DepEquiv_PartialEquivK _ _ 
     exact (pe_sect (IsPartialEquiv := pe_isequiv (CanonicalPartialEquiv := _)) (fun a' c => ff a a' b c) a' c).
     
     intro. pose (pe_inv (IsPartialEquiv := pe_isequiv (CanonicalPartialEquiv := H a)) .(p_mon _ _) a' c). cbn in r0.
-    assert ((λ _ : C_2, Fail C_3 c1) = (λ _ : C_2, Fail C_3 (Cast_info_wrap "cast" C_3))).
+    assert ((λ _ : C_2, Fail C_3 t) = (λ _ : C_2, Fail C_3 (Cast_info_wrap "cast"))).
     apply FunExt. intro; apply ap, is_hprop.
     rewrite H1. clear H1. generalize dependent r0.
-    destruct ( pe_inv (IsPartialEquiv := pe_isequiv (CanonicalPartialEquiv := H a)) (λ _ : C_2, Fail C_3 (Cast_info_wrap "cast" C_3)) a' c); simpl; eauto.  inversion 1.
+    destruct ( pe_inv (IsPartialEquiv := pe_isequiv (CanonicalPartialEquiv := H a)) (λ _ : C_2, Fail C_3 (Cast_info_wrap "cast")) a' c); simpl; eauto.  inversion 1.
     inversion 1. 
   + intros ff b c. 
     unfold compose, to_simpl_dom2, to_simpl_dom, to_dep_dom2 in *; simpl in *.
@@ -256,9 +260,9 @@ pose (pek_sect (IsPartialEquivK := pek_isequiv (p := DepEquiv_PartialEquivK _ _ 
   exact id. 
 
   intros e _. revert e. 
-  pose (F := pe_fun (pe_inv (IsPartialEquiv := pe_isequiv (CanonicalPartialEquiv := H a)) (λ _ : C_2, Fail C_3 c0))).
+  pose (F := pe_fun (pe_inv (IsPartialEquiv := pe_isequiv (CanonicalPartialEquiv := H a)) (λ _ : C_2, Fail C_3 t))).
   simpl in *.
-  change (F c ≼ Fail C_3 c0 -> F c ≼ ff b c).
+  change (F c ≼ Fail C_3 t -> F c ≼ ff b c).
   destruct (F c); simpl; eauto. 
   intro e; inversion e. 
   + intro f. apply FunExt. intro. simpl. apply FunExt. intro.
@@ -268,9 +272,9 @@ pose (pek_sect (IsPartialEquivK := pek_isequiv (p := DepEquiv_PartialEquivK _ _ 
 (* This instance must be here because before, it would break some
    type class inferences, I don't understand why ?*)
 
-Instance DepEquiv_with_pe A A' B C (f : A' -> A) {Hf: IsInjective f}
+Instance DepEquiv_with_pe A A' B C (f : A' -> A) {HC : IsHSet C} {Hf: IsInjective f}
          {HP : B ≈ C} : (fun a => B (f a)) ≈ C :=
-  Build_DepEquiv A' (fun a => B (f a)) C (fun a c => P (f a) c)
+  Build_DepEquiv A' (fun a => B (f a)) C HC (fun a c => P (f a) c)
                 (fun a' => total_equiv (f a'))
                 (λ a : A', partial_equiv (f a))
                 (fun c => a <- c_to_a c; f^?-1 a) _ showC. 

@@ -19,9 +19,9 @@ Arguments Some {_ _} _.
     We would not prositional truncation an axiom we were using 
     the simpler version with None *)
 
-Definition Cast_info := Trunc (string * Type).
+Notation Cast_info := (Trunc (string)).
 
-Definition Cast A := _Cast A Cast_info. 
+Notation Cast A := (_Cast A Cast_info). 
 
 Unset Implicit Arguments.
 
@@ -72,8 +72,8 @@ Definition Some_inj_retr {A} {x y : Cast A} (e: x = y) :
   path_Cast (path_Cast_inv e) = e. 
 Proof.
   destruct e, x. reflexivity.
-  simpl. assert (is_hprop c c = eq_refl).
-  simple refine (@contr _ (IsHProp_contr _ c c) eq_refl).
+  simpl. assert (is_hprop t t = eq_refl).
+  simple refine (@contr _ (IsHProp_contr _ t t) eq_refl).
   rewrite H. reflexivity.
 Defined.
 
@@ -135,8 +135,13 @@ Extraction Language Ocaml.
 (** Transparent extraction of Cast:
     - if Some t, then extract plain t
     - if Fail, then fail with a runtime cast exception **)
+
+Record cast_erasure (X Y : Type) :=
+  Build_erasure
+    { f_ord : X }.
+      
 Extract Inductive _Cast
-=> ""
+=> "cast_erasure"
      [ ""
        "(let f s = 
           failwith (String.concat """" ([""Cast failure: ""]@ 
@@ -150,9 +155,9 @@ Extract Inductive _Cast
 
 Example cast_some {info} : unit -> _Cast bool info := fun _ => Some true.
 
-Definition Cast_info_wrap s A : Cast_info := (tr (s, A)).
+Definition Cast_info_wrap s : Cast_info := (tr s).
 
-Example cast_fail : unit -> Cast bool := fun _ => Fail bool (Cast_info_wrap "H" bool).
+Example cast_fail : unit -> Cast bool := fun _ => Fail bool (Cast_info_wrap "H").
 
 Example use_bool (cb: Cast bool)  := cb >>= (fun b => creturn (andb b b)).
 
@@ -191,7 +196,7 @@ Instance PreOrderCast A : PreOrder_p (Cast A) :=
                      | Some _ => a = a'
                      | Fail _ _ => True
                      end;
-     bot := Fail _ (Cast_info_wrap "cast" A) |}.
+     bot := Fail _ (Cast_info_wrap "cast") |}.
 Proof.
   - destruct x. reflexivity. exact I.
   - intros x y z. destruct x, y; intros e e'; auto. 

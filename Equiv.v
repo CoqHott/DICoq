@@ -203,7 +203,7 @@ Definition to_subset {C P} `{Show C} `{forall c, CheckableProp (P c)}
            : C ⇀ ({c:C & P c}) := fun c => 
    match dec (@checkP _ check) with 
   | inl p => Some (c; convert p)
-  | inr _ => Fail _ (Cast_info_wrap (show c) (P c))
+  | inr _ => Fail _ (Cast_info_wrap (show c))
   end.
 
 Instance HSet_HProp X `{IsHSet X} : forall (a b : X), IsHProp (a = b) :=
@@ -291,7 +291,7 @@ Defined.
 
 Definition S_inv (n: nat) :=
   match n with
-    | O => Fail _ (Cast_info_wrap "invalid index" (n > 0))
+    | O => Fail _ (Cast_info_wrap "invalid index")
     | S n' => Some n'
   end.
   

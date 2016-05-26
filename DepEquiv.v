@@ -30,7 +30,7 @@ A _dependent_ type is a type family [A → Type] indexed by some type
 *)
 
 
-Class DepEquiv A (B: A -> Type) (C:HSet)
+Class DepEquiv A (B: A -> Type) (C:Type) {HC : IsHSet C}
   :=
     {
       P : A -> C -> Type;
@@ -50,25 +50,25 @@ Hint Extern 1 (IsEquiv ?f) => apply (e_isequiv (e := total_equiv _)) :
 Hint Extern 1 (IsPartialEquivK ?f) => apply (pek_isequiv (p := partial_equiv _)) :
              typeclass_instances.
 
-Definition c_to_b {A} {B: A -> Type} {C}
+Definition c_to_b {A} {B: A -> Type} {C} {HC : IsHSet C}
            `{B ≈ C} {a:A}:
   {c:C & P a c} -> (B a) := e_inv.
 
-Definition b_to_c {A} {B: A -> Type} {C}
+Definition b_to_c {A} {B: A -> Type} {C} {HC : IsHSet C}
            `{B ≈ C} {a:A}:
   B a -> {c:C & P a c} := (total_equiv a).(e_fun). 
 
-Definition to_rich {A} {B: A -> Type} {C}
+Definition to_rich {A} {B: A -> Type} {C} {HC : IsHSet C}
            `{B ≈ C} {a:A}:
   C ⇀ {c: C & P a c} :=
   pek_inv.
 
-Program Definition to_dep {A} {B: A -> Type} {C}
+Program Definition to_dep {A} {B: A -> Type} {C} {HC : IsHSet C}
            `{B ≈ C}
            (a:A) : C ⇀ (B a) := fun c =>
     c' <- pek_inv c; clift e_inv c'.
     
-Definition to_simpl {A} {B: A -> Type} {C} 
+Definition to_simpl {A} {B: A -> Type} {C} {HC : IsHSet C}
            `{B ≈ C}
            {a:A} : B a ⇀ C := 
   (partial_equiv a).(pek_fun) ° ((total_equiv a).(e_fun)).
@@ -99,7 +99,7 @@ Defined.
 
 
 Definition DepEquiv_PartialEquivK  (A : Type) (B : A → Type)
-         (C : HSet) `{B ≈ C} (a:A) : B a ≃?K C.
+         C {HC : IsHSet C} `{B ≈ C} (a:A) : B a ≃?K C.
 Proof. 
   simple refine ({| pek_fun := to_simpl;
                     pek_isequiv := {| pek_inv := to_dep a|} |}).
@@ -128,12 +128,12 @@ Defined.
 
 (** ** Casts for non-dependent functions *)
 
-Definition to_dep_dom {A} {B: A -> Type} {C} {X}
+Definition to_dep_dom {A} {B: A -> Type} {C} {HC : IsHSet C} {X}
            `{B ≈ C}
            (f: C ⇀ X) (a:A) : B a ⇀ X :=
   f °° to_simpl. 
 
-Definition to_dep_dom2 {A} {B: A -> Type} {C} {X Y}
+Definition to_dep_dom2 {A} {B: A -> Type} {C} {HC : IsHSet C} {X Y}
            `{B ≈ C}
            (f: C -> Y ⇀ X) : forall a, B a -> Y ⇀ X :=
   fun a b x=> 
@@ -149,8 +149,6 @@ Definition to_simpl_dom {A} {B: A -> Type} {C X}
     a  <- c_to_a c;
     b  <- to_dep a c ;
     f a b.
-
-
 
 Program Definition TotalEquiv A (B: A -> Type) C (P: A -> C -> Type)
    {DREquiv_prop : forall a c, IsHProp (P a c)}
@@ -169,7 +167,7 @@ Next Obligation.
   apply (is_hprop (IsHProp := isHSet (IsHSet := trunc_sigma _ _) _ _)).
 Defined. 
 
-Definition IsDepEquiv A (B: A -> Type) (C:HSet) (P: A -> C -> Type)
+Definition IsDepEquiv A (B: A -> Type) C {HC : IsHSet C} (P: A -> C -> Type)
          
    {DepEquiv_check : forall a c, CheckableProp (P a c)}  
    (b_to_c : forall a, B a -> {c : C & P a c})
@@ -180,7 +178,7 @@ Definition IsDepEquiv A (B: A -> Type) (C:HSet) (P: A -> C -> Type)
    (prop_c_to_a : forall a (b:B a), c_to_a (b_to_c _ b).1 = Some a)
    {Show_C : Show C}
   : B ≈ C :=
-  Build_DepEquiv A B C P
+  Build_DepEquiv A B C HC P
                 (TotalEquiv A B C P b_to_c c_to_b prop_b_to_b prop_c_to_c)
                 (fun a => Checkable_PartialEquivK C (P a))
                 c_to_a prop_c_to_a Show_C.
@@ -191,7 +189,7 @@ Type] as long as we can recompute the index from an inhabitant of
 [C]. This is the role of the function [c_to_a_rel]. *)
 
 
-Definition DepEquiv_rel {A} {B: A -> Type} {C:HSet} (R : Cast A -> A -> Type)
+Definition DepEquiv_rel {A} {B: A -> Type} {C}{HC : IsHSet C} (R : Cast A -> A -> Type)
    (c_to_a_rel : C ⇀ A)
    (P := fun a c => R (c_to_a_rel c) a)
    (b_to_c_rel : forall a, B a -> {c : C & P a c})
@@ -210,7 +208,7 @@ Definition DepEquiv_rel {A} {B: A -> Type} {C:HSet} (R : Cast A -> A -> Type)
 (** A particular case of the above scenario consists in taking
 (decidable) equality on [A]. *)
 
-Definition DepEquiv_eq {A} {B: A -> Type} {C:HSet}
+Definition DepEquiv_eq {A} {B: A -> Type} {C} {HC : IsHSet C}
    {DecidablePaths_A : DecidablePaths A}
    {DepShow : Show C}
    (c_to_a_eq : C ⇀ A)

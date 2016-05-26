@@ -233,11 +233,11 @@ Proof.
   (* admit it*)
 Admitted.
 
-Record HSet :=
-  {
-    _typeS :> Type;
-    _HSet_isHSet : IsHSet _typeS
-  }.
+(* Record HSet := *)
+(*   { *)
+(*     _typeS :> Type; *)
+(*     _HSet_isHSet : IsHSet _typeS *)
+(*   }. *)
 
 Record HProp :=
   {
@@ -246,7 +246,7 @@ Record HProp :=
   }.
 
 
-Instance HSet_isHSet (S:HSet) : IsHSet S := S.(_HSet_isHSet).
+(* Instance HSet_isHSet (S:HSet) : IsHSet S := S.(_HSet_isHSet). *)
 
 Instance HProp_isHProp (S:HProp) : IsHProp S := S.(_HProp_isHProp).
 

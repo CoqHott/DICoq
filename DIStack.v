@@ -1,4 +1,5 @@
 Set Universe Polymorphism.
+
 Require Import Showable String Decidable List DepEquiv HODepEquiv HoTT.
 Local Open Scope string_scope.
 
@@ -68,7 +69,7 @@ Definition instr_index n (i:instr) : Cast nat :=
     | NConst _ => creturn (S n)
     | NPlus => match n with
                  | S (S n) => creturn (S n)
-                 | _ => Fail _ (Cast_info_wrap "invalid instruction" nat)
+                 | _ => Fail _ (Cast_info_wrap "invalid instruction")
                end
   end.
 
@@ -110,11 +111,9 @@ Definition list_to_dstack {n} : {l : list nat & clift (info := Cast_info) (lengt
   - specialize (IHl (length l) eq_refl). inversion H. exact (a,IHl).
 Defined.
 
-Definition Hlist A  `{DecidablePaths A} := {| _typeS := list A |} : HSet.
-
 Instance DepEquiv_dstack :
-  dstack ≈ (Hlist nat) :=
-  @DepEquiv_eq _ _ (Hlist nat) _ _ (clift (length (A:=nat))) (@dstack_to_list) (@list_to_dstack) _ _ _.
+  dstack ≈ (list nat) :=
+  @DepEquiv_eq _ _ (list nat) _ _ _ (clift (length (A:=nat))) (@dstack_to_list) (@list_to_dstack) _ _ _.
 { unfold compose. intro n. 
   induction n; intro s; simpl. 
   - destruct s. reflexivity.
@@ -221,12 +220,10 @@ Definition DepEquiv_instr_retr n m (x:{i:instr & instr_index n i = Some m}) :
                                (NPlus; v) eq_refl (is_hprop _ _) end
             end v end.
 
-Definition Hinstr := {| _typeS := instr |} : HSet.
-
 Instance DepEquiv_instr n :
-  (dinstr n) ≈ Hinstr
+  (dinstr n) ≈ instr
   :=
-    @DepEquiv_eq _ _ Hinstr _ _
+    @DepEquiv_eq _ _ instr _ _ _
                  (instr_index n)
                  (dinstr_to_instr n) 
                  (instr_to_dinstr n) _ _ _.
@@ -239,15 +236,15 @@ Defined.
 
 (** Lifting exec to safely accept instr and list nat **)
 
-Definition simple_exec : Hinstr → Hlist nat ⇀ Hlist nat := lift2 exec.
+Definition simple_exec : instr → list nat ⇀ list nat := lift2 exec.
 
 Arguments lift2 {_ _ _ _ _ _ _ _ } _ _ _ _.
 
 (* Pretty Printing of safe_exec *)
 
-Arguments HODepEquiv {_ _ _}  _ {_ _} _.
-Arguments HODepEquiv2 {_ _ _ _ _ _ _ _}  _ _.
-Arguments HODepEquiv2_sym {_ _ _ _ _ _ _ _} _. 
+Arguments HODepEquiv {_ _ _ _}  _ {_ _ _} _.
+Arguments HODepEquiv2 {_ _ _ _ _ _ _ _ _ _ _ _}  _ _.
+Arguments HODepEquiv2_sym {_ _ _ _ _ _ _ _ _ _ _} _. 
 Print simple_exec. 
 
 (*
@@ -271,7 +268,7 @@ Print Assumptions simple_exec.
 Require Import ExtrOcamlString ExtrOcamlNatInt.
 Extract Inductive list => "list" [ "[]" "(::)" ].
 
-Extraction "didstack" exec simple_exec.
+Extraction "distack" cast_erasure exec simple_exec.
 
 (** 
 <<

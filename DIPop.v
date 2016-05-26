@@ -66,11 +66,10 @@ Definition S_length :
   intros; induction l; inversion H; simpl; reflexivity.
 Defined.
 
-Definition Hlist A  `{DecidablePaths A} := {| _typeS := list A |} : HSet.
-  
+ 
 Instance DepEquiv_vector_list_simpl A `{Show A} `{DecidablePaths A}  :
-  (vector A) ≈ Hlist A  :=
-  @DepEquiv_eq nat (vector A) (Hlist A) _ _ (clift (length (A:=A)))
+  (vector A) ≈ list A  :=
+  @DepEquiv_eq nat (vector A) (list A) _ _ _ (clift (length (A:=A)))
               (vector_to_list A) (list_to_vector A) _ _ _.
 Proof.
    - intro n. (* Sect (nvector_to_nlist a) (nlist_to_nvector a) *)
@@ -112,10 +111,10 @@ Arguments Vector.tl {_} _ _.
 
 (** We simply lifting the domain *)
 
-Definition map_list (f : nat -> nat) : Hlist nat ⇀ Hlist nat :=
+Definition map_list (f : nat -> nat) : list nat ⇀ list nat :=
   lift (Vector.map f).
 
-Definition pop : Hlist nat ⇀ Hlist nat := lift (Vector.tl).
+Definition pop : list nat ⇀ list nat := lift (Vector.tl).
 
 Eval compute in (pop nil).
 
