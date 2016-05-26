@@ -1,0 +1,6 @@
+{
+  "name": "DiCoq",
+  "tagline": "Dependent Interoperability for Coq",
+  "body": "\r\n# DICoq\r\nDependent Interoperability for Coq\r\n\r\nThe repository contains the companioon code of the publication\r\nPartial Type Equivalences for Verified Dependent Interoperability (ICFP'16).\r\n",
+  "note": "Don't delete this file! It's used internally to help with page regeneration."
+}
