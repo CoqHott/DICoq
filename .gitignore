@@ -2,3 +2,6 @@
 *.glob
 *.v.d
 *.aux
+*.ml
+*.mli
+Makefile_coq
