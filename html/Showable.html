@@ -1,0 +1,123 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link href="coqdoc.css" rel="stylesheet" type="text/css" />
+<title>Showable</title>
+</head>
+
+<body>
+
+<div id="page">
+
+<div id="header">
+</div>
+
+<div id="main">
+
+<h1 class="libtitle">Library Showable</h1>
+
+<div class="code">
+
+<br/>
+<span class="id" title="keyword">Require</span> <span class="id" title="keyword">Import</span> <a class="idref" href="http://coq.inria.fr/distrib/8.5/stdlib/Coq.Strings.String.html#"><span class="id" title="library">String</span></a> <a class="idref" href="http://coq.inria.fr/distrib/8.5/stdlib/Coq.Lists.List.html#"><span class="id" title="library">List</span></a>.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+<a name="lab47"></a><h1 class="section">The <span class="inlinecode"><span class="id" title="keyword">Show</span></span> class</h1>
+
+<div class="paragraph"> </div>
+
+ The <span class="inlinecode"><span class="id" title="keyword">Show</span></span> class converts values to strings. It is similar to the
+ Haskell Show class 
+</div>
+<div class="code">
+
+<br/>
+<span class="id" title="keyword">Class</span> <span class="id" title="keyword">Show</span> (<span class="id" title="var">A</span> :<span class="id" title="keyword">Type</span>) := { <a name="show"><span class="id" title="projection">show</span></a> : <a class="idref" href="Showable.html#A"><span class="id" title="variable">A</span></a> <a class="idref" href="http://coq.inria.fr/distrib/8.5/stdlib/Coq.Init.Logic.html#d43e996736952df71ebeeae74d10a287"><span class="id" title="notation">→</span></a> <a class="idref" href="http://coq.inria.fr/distrib/8.5/stdlib/Coq.Strings.String.html#string"><span class="id" title="inductive">string</span></a> }.<br/>
+
+<br/>
+<span class="id" title="keyword">Local Open</span> <span class="id" title="keyword">Scope</span> <span class="id" title="var">string_scope</span>.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+<a name="lab48"></a><h2 class="section">Default Instance:</h2>
+
+</div>
+<div class="code">
+
+<br/>
+<span class="id" title="keyword">Definition</span> <a name="not_implemented"><span class="id" title="definition">not_implemented</span></a> := "not implemented".<br/>
+<span class="id" title="keyword">Axiom</span> <a name="show_not_implemented_for"><span class="id" title="axiom">show_not_implemented_for</span></a>: <span class="id" title="keyword">∀</span> (<span class="id" title="var">A</span>: <span class="id" title="keyword">Type</span>), <a class="idref" href="http://coq.inria.fr/distrib/8.5/stdlib/Coq.Strings.String.html#string"><span class="id" title="inductive">string</span></a>.<br/>
+
+<br/>
+<span class="id" title="keyword">Instance</span> <a name="show_default"><span class="id" title="instance">show_default</span></a> <span class="id" title="var">A</span> : <span class="id" title="keyword">Show</span> <a class="idref" href="Showable.html#A"><span class="id" title="variable">A</span></a> | 1000 := {| <a class="idref" href="Showable.html#Build_Show"><span class="id" title="constructor">show</span></a> <a class="idref" href="Showable.html#Build_Show"><span class="id" title="constructor">:=</span></a> <span class="id" title="keyword">fun</span> <a class="idref" href="Showable.html#Build_Show"><span class="id" title="constructor">_</span></a> <a class="idref" href="Showable.html#Build_Show"><span class="id" title="constructor">⇒</span></a> <a class="idref" href="Showable.html#Build_Show"><span class="id" title="constructor">show_not_implemented_for</span></a> <a class="idref" href="Showable.html#Build_Show"><span class="id" title="constructor">A</span></a> |}.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+<a name="lab49"></a><h2 class="section">Instance for nat</h2>
+
+</div>
+<div class="code">
+<span class="id" title="keyword">Instance</span> <a name="show_nat"><span class="id" title="instance">show_nat</span></a> : <span class="id" title="keyword">Show</span> <a class="idref" href="http://coq.inria.fr/distrib/8.5/stdlib/Coq.Init.Datatypes.html#nat"><span class="id" title="inductive">nat</span></a> | 0 :=<br/>
+&nbsp;&nbsp;{| <a class="idref" href="Showable.html#Build_Show"><span class="id" title="constructor">show</span></a> <a class="idref" href="Showable.html#Build_Show"><span class="id" title="constructor">:=</span></a> <span class="id" title="keyword">fix</span> <a class="idref" href="Showable.html#Build_Show"><span class="id" title="constructor">_show_nat</span></a> <a class="idref" href="Showable.html#Build_Show"><span class="id" title="constructor">n</span></a> <a class="idref" href="Showable.html#Build_Show"><span class="id" title="constructor">:=</span></a><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">match</span> <a class="idref" href="Showable.html#Build_Show"><span class="id" title="constructor">n</span></a> <span class="id" title="keyword">with</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a class="idref" href="Showable.html#Build_Show"><span class="id" title="constructor">|</span></a> <a class="idref" href="Showable.html#Build_Show"><span class="id" title="constructor">O</span></a> <a class="idref" href="Showable.html#Build_Show"><span class="id" title="constructor">⇒</span></a> "O"<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a class="idref" href="Showable.html#Build_Show"><span class="id" title="constructor">|</span></a> <a class="idref" href="Showable.html#Build_Show"><span class="id" title="constructor">S</span></a> <a class="idref" href="Showable.html#Build_Show"><span class="id" title="constructor">n0</span></a> <a class="idref" href="Showable.html#Build_Show"><span class="id" title="constructor">⇒</span></a> "S (" <a class="idref" href="Showable.html#Build_Show"><span class="id" title="constructor">++</span></a> <a class="idref" href="Showable.html#Build_Show"><span class="id" title="constructor">_show_nat</span></a> <a class="idref" href="Showable.html#Build_Show"><span class="id" title="constructor">n0</span></a> <a class="idref" href="Showable.html#Build_Show"><span class="id" title="constructor">++</span></a> ")"<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">end</span><br/>
+&nbsp;&nbsp;|}.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+<a name="lab50"></a><h2 class="section">Instance for list</h2>
+
+</div>
+<div class="code">
+<span class="id" title="keyword">Fixpoint</span> <a name="_show_list"><span class="id" title="definition">_show_list</span></a> {<span class="id" title="var">A</span>} `{<span class="id" title="keyword">Show</span> <a class="idref" href="Showable.html#A"><span class="id" title="variable">A</span></a>} (<span class="id" title="var">l</span>: <a class="idref" href="http://coq.inria.fr/distrib/8.5/stdlib/Coq.Init.Datatypes.html#list"><span class="id" title="inductive">list</span></a> <a class="idref" href="Showable.html#A"><span class="id" title="variable">A</span></a>) :=<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">match</span> <a class="idref" href="Showable.html#l"><span class="id" title="variable">l</span></a> <span class="id" title="keyword">with</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;| <a class="idref" href="http://coq.inria.fr/distrib/8.5/stdlib/Coq.Init.Datatypes.html#nil"><span class="id" title="constructor">nil</span></a> ⇒ ""<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id" title="var">a</span> <a class="idref" href="http://coq.inria.fr/distrib/8.5/stdlib/Coq.Init.Datatypes.html#0a8150c3c4df34d205c5ed9a427e2ed5"><span class="id" title="notation">::</span></a> <span class="id" title="var">l</span> ⇒ <a class="idref" href="Showable.html#show"><span class="id" title="method">show</span></a> <span class="id" title="var">a</span> <a class="idref" href="http://coq.inria.fr/distrib/8.5/stdlib/Coq.Strings.String.html#6c3bece79abbc48868e7371c2d2fa55c"><span class="id" title="notation">++</span></a> "," <a class="idref" href="http://coq.inria.fr/distrib/8.5/stdlib/Coq.Strings.String.html#6c3bece79abbc48868e7371c2d2fa55c"><span class="id" title="notation">++</span></a> <a class="idref" href="Showable.html#_show_list"><span class="id" title="definition">_show_list</span></a> <a class="idref" href="Showable.html#l"><span class="id" title="variable">l</span></a><br/>
+&nbsp;&nbsp;<span class="id" title="keyword">end</span>.<br/>
+
+<br/>
+<span class="id" title="keyword">Instance</span> <a name="inst_show_list"><span class="id" title="instance">inst_show_list</span></a> {<span class="id" title="var">A</span>} `{<span class="id" title="keyword">Show</span> <a class="idref" href="Showable.html#A"><span class="id" title="variable">A</span></a>} : <span class="id" title="keyword">Show</span> (<a class="idref" href="http://coq.inria.fr/distrib/8.5/stdlib/Coq.Init.Datatypes.html#list"><span class="id" title="inductive">list</span></a> <a class="idref" href="Showable.html#A"><span class="id" title="variable">A</span></a>) :=<br/>
+&nbsp;&nbsp;{| <a class="idref" href="Showable.html#Build_Show"><span class="id" title="constructor">show</span></a> <a class="idref" href="Showable.html#Build_Show"><span class="id" title="constructor">l</span></a> <a class="idref" href="Showable.html#Build_Show"><span class="id" title="constructor">:=</span></a> "(" <a class="idref" href="Showable.html#Build_Show"><span class="id" title="constructor">++</span></a> <a class="idref" href="Showable.html#Build_Show"><span class="id" title="constructor">_show_list</span></a> <a class="idref" href="Showable.html#Build_Show"><span class="id" title="constructor">l</span></a> <a class="idref" href="Showable.html#Build_Show"><span class="id" title="constructor">++</span></a> ")" |}.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+<a name="lab51"></a><h2 class="section">Instance for vector</h2>
+
+</div>
+<div class="code">
+<span class="id" title="keyword">Require</span> <a class="idref" href="Vector.html#"><span class="id" title="library">Vector</span></a>.<br/>
+<span class="id" title="keyword">Fixpoint</span> <a name="_show_vector"><span class="id" title="definition">_show_vector</span></a> {<span class="id" title="var">A</span> <span class="id" title="var">n</span>} `{<span class="id" title="keyword">Show</span> <a class="idref" href="Showable.html#A"><span class="id" title="variable">A</span></a>} (<span class="id" title="var">v</span>: <a class="idref" href="Vector.html#t"><span class="id" title="inductive">Vector.t</span></a> <a class="idref" href="Showable.html#A"><span class="id" title="variable">A</span></a> <a class="idref" href="Showable.html#n"><span class="id" title="variable">n</span></a>) :=<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">match</span> <a class="idref" href="Showable.html#v"><span class="id" title="variable">v</span></a> <span class="id" title="keyword">with</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;| <a class="idref" href="Vector.html#nil"><span class="id" title="constructor">Vector.nil</span></a> <span class="id" title="var">_</span> ⇒ ""<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;| <a class="idref" href="Vector.html#cons"><span class="id" title="constructor">Vector.cons</span></a> <span class="id" title="var">_</span> <span class="id" title="var">x</span> <span class="id" title="var">_</span> <span class="id" title="var">v'</span> ⇒ <a class="idref" href="Showable.html#show"><span class="id" title="method">show</span></a> <span class="id" title="var">x</span> <a class="idref" href="http://coq.inria.fr/distrib/8.5/stdlib/Coq.Strings.String.html#6c3bece79abbc48868e7371c2d2fa55c"><span class="id" title="notation">++</span></a> ";" <a class="idref" href="http://coq.inria.fr/distrib/8.5/stdlib/Coq.Strings.String.html#6c3bece79abbc48868e7371c2d2fa55c"><span class="id" title="notation">++</span></a> <a class="idref" href="Showable.html#_show_vector"><span class="id" title="definition">_show_vector</span></a> <span class="id" title="var">v'</span><br/>
+&nbsp;&nbsp;<span class="id" title="keyword">end</span>.<br/>
+
+<br/>
+<span class="id" title="keyword">Instance</span> <a name="inst_show_vector"><span class="id" title="instance">inst_show_vector</span></a> {<span class="id" title="var">A</span> <span class="id" title="var">n</span>} `{<span class="id" title="keyword">Show</span> <a class="idref" href="Showable.html#A"><span class="id" title="variable">A</span></a>} : <span class="id" title="keyword">Show</span> (<a class="idref" href="Vector.html#t"><span class="id" title="inductive">Vector.t</span></a> <a class="idref" href="Showable.html#A"><span class="id" title="variable">A</span></a> <a class="idref" href="Showable.html#n"><span class="id" title="variable">n</span></a>) :=<br/>
+&nbsp;&nbsp;{| <a class="idref" href="Showable.html#Build_Show"><span class="id" title="constructor">show</span></a> <a class="idref" href="Showable.html#Build_Show"><span class="id" title="constructor">v</span></a> <a class="idref" href="Showable.html#Build_Show"><span class="id" title="constructor">:=</span></a> "[" <a class="idref" href="Showable.html#Build_Show"><span class="id" title="constructor">++</span></a> <a class="idref" href="Showable.html#Build_Show"><span class="id" title="constructor">_show_vector</span></a> <a class="idref" href="Showable.html#Build_Show"><span class="id" title="constructor">v</span></a> <a class="idref" href="Showable.html#Build_Show"><span class="id" title="constructor">++</span></a> "]" |}.<br/>
+</div>
+</div>
+
+<div id="footer">
+<hr/><a href="index.html">Index</a><hr/>This page has been generated by <a href="http://coq.inria.fr/">coqdoc</a>
+</div>
+
+</div>
+
+</body>
+</html>

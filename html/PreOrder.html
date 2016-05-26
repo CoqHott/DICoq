@@ -1,0 +1,75 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link href="coqdoc.css" rel="stylesheet" type="text/css" />
+<title>PreOrder</title>
+</head>
+
+<body>
+
+<div id="page">
+
+<div id="header">
+</div>
+
+<div id="main">
+
+<h1 class="libtitle">Library PreOrder</h1>
+
+<div class="code">
+
+<br/>
+</div>
+
+<div class="doc">
+<a name="lab46"></a><h1 class="section">Pointed preorder</h1>
+
+</div>
+<div class="code">
+
+<br/>
+<span class="id" title="keyword">Reserved Notation</span> &quot;x ≼ y" (<span class="id" title="tactic">at</span> <span class="id" title="keyword">level</span> 50).<br/>
+
+<br/>
+<span class="id" title="keyword">Class</span> <a name="PreOrder_p"><span class="id" title="record">PreOrder_p</span></a> (<span class="id" title="var">A</span>:<span class="id" title="keyword">Type</span>) :=<br/>
+&nbsp;&nbsp;{ <a name="rel"><span class="id" title="projection">rel</span></a> : <a class="idref" href="PreOrder.html#A"><span class="id" title="variable">A</span></a> <a class="idref" href="http://coq.inria.fr/distrib/8.5/stdlib/Coq.Init.Logic.html#d43e996736952df71ebeeae74d10a287"><span class="id" title="notation">→</span></a> <a class="idref" href="PreOrder.html#A"><span class="id" title="variable">A</span></a> <a class="idref" href="http://coq.inria.fr/distrib/8.5/stdlib/Coq.Init.Logic.html#d43e996736952df71ebeeae74d10a287"><span class="id" title="notation">→</span></a> <span class="id" title="keyword">Prop</span> <span class="id" title="keyword">where</span> &quot;x ≼ y" := (<a class="idref" href="PreOrder.html#rel"><span class="id" title="method">rel</span></a> <span class="id" title="var">x</span> <span class="id" title="var">y</span>);<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<a name="bot"><span class="id" title="projection">bot</span></a> : <a class="idref" href="PreOrder.html#A"><span class="id" title="variable">A</span></a>;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<a name="rel_refl"><span class="id" title="projection">rel_refl</span></a> : <span class="id" title="keyword">∀</span> <span class="id" title="var">x</span>, <a class="idref" href="PreOrder.html#x"><span class="id" title="variable">x</span></a> <a class="idref" href="PreOrder.html#46f77f4d37da9df3da8d4702a9d3eb7e"><span class="id" title="notation">≼</span></a> <a class="idref" href="PreOrder.html#x"><span class="id" title="variable">x</span></a> ;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<a name="rel_trans"><span class="id" title="projection">rel_trans</span></a> : <span class="id" title="keyword">∀</span> <span class="id" title="var">x</span> <span class="id" title="var">y</span> <span class="id" title="var">z</span>, <a class="idref" href="PreOrder.html#x"><span class="id" title="variable">x</span></a> <a class="idref" href="PreOrder.html#46f77f4d37da9df3da8d4702a9d3eb7e"><span class="id" title="notation">≼</span></a> <a class="idref" href="PreOrder.html#y"><span class="id" title="variable">y</span></a> <a class="idref" href="http://coq.inria.fr/distrib/8.5/stdlib/Coq.Init.Logic.html#d43e996736952df71ebeeae74d10a287"><span class="id" title="notation">→</span></a> <a class="idref" href="PreOrder.html#y"><span class="id" title="variable">y</span></a> <a class="idref" href="PreOrder.html#46f77f4d37da9df3da8d4702a9d3eb7e"><span class="id" title="notation">≼</span></a> <a class="idref" href="PreOrder.html#z"><span class="id" title="variable">z</span></a> <a class="idref" href="http://coq.inria.fr/distrib/8.5/stdlib/Coq.Init.Logic.html#d43e996736952df71ebeeae74d10a287"><span class="id" title="notation">→</span></a> <a class="idref" href="PreOrder.html#x"><span class="id" title="variable">x</span></a> <a class="idref" href="PreOrder.html#46f77f4d37da9df3da8d4702a9d3eb7e"><span class="id" title="notation">≼</span></a> <a class="idref" href="PreOrder.html#z"><span class="id" title="variable">z</span></a>;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<a name="bot_is_least"><span class="id" title="projection">bot_is_least</span></a> : <span class="id" title="keyword">∀</span> <span class="id" title="var">a</span>, <a class="idref" href="PreOrder.html#bot"><span class="id" title="method">bot</span></a> <a class="idref" href="PreOrder.html#46f77f4d37da9df3da8d4702a9d3eb7e"><span class="id" title="notation">≼</span></a> <a class="idref" href="PreOrder.html#a"><span class="id" title="variable">a</span></a> <br/>
+&nbsp;&nbsp;}.<br/>
+
+<br/>
+<span class="id" title="keyword">Notation</span> <a name="46f77f4d37da9df3da8d4702a9d3eb7e"><span class="id" title="notation">&quot;</span></a>x ≼ y" := (<a class="idref" href="PreOrder.html#rel"><span class="id" title="method">rel</span></a> <span class="id" title="var">x</span> <span class="id" title="var">y</span>).<br/>
+
+<br/>
+<span class="id" title="keyword">Instance</span> <a name="PreOrder_forall"><span class="id" title="instance">PreOrder_forall</span></a> <span class="id" title="var">A</span> (<span class="id" title="var">B</span>:<a class="idref" href="PreOrder.html#A"><span class="id" title="variable">A</span></a> <a class="idref" href="http://coq.inria.fr/distrib/8.5/stdlib/Coq.Init.Logic.html#d43e996736952df71ebeeae74d10a287"><span class="id" title="notation">→</span></a> <span class="id" title="keyword">Type</span>) `{<span class="id" title="keyword">∀</span> <span class="id" title="var">a</span>, <a class="idref" href="PreOrder.html#PreOrder_p"><span class="id" title="class">PreOrder_p</span></a> (<a class="idref" href="PreOrder.html#B"><span class="id" title="variable">B</span></a> <a class="idref" href="PreOrder.html#a"><span class="id" title="variable">a</span></a>)} :<br/>
+&nbsp;&nbsp;<a class="idref" href="PreOrder.html#PreOrder_p"><span class="id" title="class">PreOrder_p</span></a> (<span class="id" title="keyword">∀</span> <span class="id" title="var">a</span>, <a class="idref" href="PreOrder.html#B"><span class="id" title="variable">B</span></a> <a class="idref" href="PreOrder.html#a"><span class="id" title="variable">a</span></a>) :=<br/>
+&nbsp;&nbsp;{| <a class="idref" href="PreOrder.html#Build_PreOrder_p"><span class="id" title="constructor">rel</span></a> <a class="idref" href="PreOrder.html#Build_PreOrder_p"><span class="id" title="constructor">:=</span></a> <span class="id" title="keyword">fun</span> <a class="idref" href="PreOrder.html#Build_PreOrder_p"><span class="id" title="constructor">f</span></a> <a class="idref" href="PreOrder.html#Build_PreOrder_p"><span class="id" title="constructor">g</span></a> <a class="idref" href="PreOrder.html#Build_PreOrder_p"><span class="id" title="constructor">⇒</span></a> <span class="id" title="keyword">∀</span> <a class="idref" href="PreOrder.html#Build_PreOrder_p"><span class="id" title="constructor">a</span></a><a class="idref" href="PreOrder.html#Build_PreOrder_p"><span class="id" title="constructor">,</span></a> <a class="idref" href="PreOrder.html#Build_PreOrder_p"><span class="id" title="constructor">f</span></a> <a class="idref" href="PreOrder.html#Build_PreOrder_p"><span class="id" title="constructor">a</span></a> <a class="idref" href="PreOrder.html#Build_PreOrder_p"><span class="id" title="constructor">≼</span></a> <a class="idref" href="PreOrder.html#Build_PreOrder_p"><span class="id" title="constructor">g</span></a> <a class="idref" href="PreOrder.html#Build_PreOrder_p"><span class="id" title="constructor">a</span></a><a class="idref" href="PreOrder.html#Build_PreOrder_p"><span class="id" title="constructor">;</span></a><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a class="idref" href="PreOrder.html#Build_PreOrder_p"><span class="id" title="constructor">bot</span></a> <a class="idref" href="PreOrder.html#Build_PreOrder_p"><span class="id" title="constructor">:=</span></a> <span class="id" title="keyword">fun</span> <a class="idref" href="PreOrder.html#Build_PreOrder_p"><span class="id" title="constructor">a</span></a> <a class="idref" href="PreOrder.html#Build_PreOrder_p"><span class="id" title="constructor">⇒</span></a> <a class="idref" href="PreOrder.html#Build_PreOrder_p"><span class="id" title="constructor">bot</span></a> |}.<br/>
+
+<br/>
+<span class="id" title="keyword">Record</span> <a name="monotone_function"><span class="id" title="record">monotone_function</span></a> <span class="id" title="var">X</span> <span class="id" title="var">Y</span> `{<a class="idref" href="PreOrder.html#PreOrder_p"><span class="id" title="class">PreOrder_p</span></a> <a class="idref" href="PreOrder.html#X"><span class="id" title="variable">X</span></a>} `{<a class="idref" href="PreOrder.html#PreOrder_p"><span class="id" title="class">PreOrder_p</span></a> <a class="idref" href="PreOrder.html#Y"><span class="id" title="variable">Y</span></a>} :=<br/>
+&nbsp;&nbsp;<a name="Build_Mon"><span class="id" title="constructor">Build_Mon</span></a><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;{ <a name="f_ord"><span class="id" title="projection">f_ord</span></a> :&gt; <a class="idref" href="PreOrder.html#X"><span class="id" title="variable">X</span></a> <a class="idref" href="http://coq.inria.fr/distrib/8.5/stdlib/Coq.Init.Logic.html#d43e996736952df71ebeeae74d10a287"><span class="id" title="notation">→</span></a> <a class="idref" href="PreOrder.html#Y"><span class="id" title="variable">Y</span></a> ;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a name="mon"><span class="id" title="projection">mon</span></a> :<span class="id" title="keyword">∀</span> <span class="id" title="var">x</span> <span class="id" title="var">y</span>, <a class="idref" href="PreOrder.html#x"><span class="id" title="variable">x</span></a> <a class="idref" href="PreOrder.html#46f77f4d37da9df3da8d4702a9d3eb7e"><span class="id" title="notation">≼</span></a> <a class="idref" href="PreOrder.html#y"><span class="id" title="variable">y</span></a> <a class="idref" href="http://coq.inria.fr/distrib/8.5/stdlib/Coq.Init.Logic.html#d43e996736952df71ebeeae74d10a287"><span class="id" title="notation">→</span></a> <a class="idref" href="PreOrder.html#f_ord"><span class="id" title="method">f_ord</span></a> <a class="idref" href="PreOrder.html#x"><span class="id" title="variable">x</span></a> <a class="idref" href="PreOrder.html#46f77f4d37da9df3da8d4702a9d3eb7e"><span class="id" title="notation">≼</span></a> <a class="idref" href="PreOrder.html#f_ord"><span class="id" title="method">f_ord</span></a> <a class="idref" href="PreOrder.html#y"><span class="id" title="variable">y</span></a>;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a name="p_mon"><span class="id" title="projection">p_mon</span></a> : <a class="idref" href="PreOrder.html#f_ord"><span class="id" title="method">f_ord</span></a> <a class="idref" href="PreOrder.html#bot"><span class="id" title="method">bot</span></a> <a class="idref" href="PreOrder.html#46f77f4d37da9df3da8d4702a9d3eb7e"><span class="id" title="notation">≼</span></a> <a class="idref" href="PreOrder.html#bot"><span class="id" title="method">bot</span></a><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;}.<br/>
+
+<br/>
+
+<br/>
+<span class="id" title="keyword">Notation</span> <a name="db9d5d46ef2ab5995e0c0739081666c1"><span class="id" title="notation">&quot;</span></a>X --&gt; Y" := (<a class="idref" href="PreOrder.html#monotone_function"><span class="id" title="record">monotone_function</span></a> <span class="id" title="var">X</span> <span class="id" title="var">Y</span>) (<span class="id" title="tactic">at</span> <span class="id" title="keyword">level</span> 10).<br/>
+</div>
+</div>
+
+<div id="footer">
+<hr/><a href="index.html">Index</a><hr/>This page has been generated by <a href="http://coq.inria.fr/">coqdoc</a>
+</div>
+
+</div>
+
+</body>
+</html>

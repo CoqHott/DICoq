@@ -1,0 +1,362 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link href="coqdoc.css" rel="stylesheet" type="text/css" />
+<title>Decidable</title>
+</head>
+
+<body>
+
+<div id="page">
+
+<div id="header">
+</div>
+
+<div id="main">
+
+<h1 class="libtitle">Library Decidable</h1>
+
+<div class="code">
+<span class="id" title="keyword">Require</span> <span class="id" title="keyword">Export</span> <a class="idref" href="http://coq.inria.fr/distrib/8.5/stdlib/Coq.Unicode.Utf8_core.html#"><span class="id" title="library">Unicode.Utf8_core</span></a>.<br/>
+<span class="id" title="keyword">Require</span> <span class="id" title="keyword">Import</span> <a class="idref" href="http://coq.inria.fr/distrib/8.5/stdlib/Coq.Bool.Bool.html#"><span class="id" title="library">Bool</span></a> <a class="idref" href="http://coq.inria.fr/distrib/8.5/stdlib/Coq.Lists.List.html#"><span class="id" title="library">List</span></a> <a class="idref" href="http://coq.inria.fr/distrib/8.5/stdlib/Coq.Arith.Le.html#"><span class="id" title="library">Le</span></a> <a class="idref" href="http://coq.inria.fr/distrib/8.5/stdlib/Coq.Strings.String.html#"><span class="id" title="library">String</span></a> <a class="idref" href="Showable.html#"><span class="id" title="library">Showable</span></a> <a class="idref" href="HoTT.html#"><span class="id" title="library">HoTT</span></a>.<br/>
+
+<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+<a name="lab17"></a><h1 class="section">The Decidable Class</h1>
+
+<div class="paragraph"> </div>
+
+ This code is mostly imported from
+<span class="inlinecode"><span class="id" title="var">https</span>://<span class="id" title="var">github.com</span>/<a class="idref" href="HoTT.html#"><span class="id" title="library">HoTT</span></a>/<a class="idref" href="HoTT.html#"><span class="id" title="library">HoTT</span></a></span>. We are defining it here to be
+independent of the Coq/HoTT library.
+
+<div class="paragraph"> </div>
+
+We can not use the Decidable class of Coq because its definition is in
+<span class="inlinecode"><span class="id" title="keyword">Prop</span></span> (using <span class="inlinecode">∨</span>) instead of <span class="inlinecode"><span class="id" title="keyword">Type</span></span> (using <span class="inlinecode">+</span>). All the predicates
+defined in this file are proof-relevant.
+
+<div class="paragraph"> </div>
+
+<a name="lab18"></a><h2 class="section">Decidability</h2>
+
+</div>
+<div class="code">
+
+<br/>
+<span class="id" title="keyword">Class</span> <a name="Decidable"><span class="id" title="record">Decidable</span></a> (<span class="id" title="var">A</span> : <span class="id" title="keyword">Type</span>) := <a name="dec"><span class="id" title="projection">dec</span></a> : <a class="idref" href="Decidable.html#A"><span class="id" title="variable">A</span></a> <a class="idref" href="http://coq.inria.fr/distrib/8.5/stdlib/Coq.Init.Datatypes.html#3dcaec3b772747610227247939f96b01"><span class="id" title="notation">+</span></a> <a class="idref" href="http://coq.inria.fr/distrib/8.5/stdlib/Coq.Init.Datatypes.html#3dcaec3b772747610227247939f96b01"><span class="id" title="notation">(</span></a><a class="idref" href="HoTT.html#not"><span class="id" title="definition">not</span></a> <a class="idref" href="Decidable.html#A"><span class="id" title="variable">A</span></a><a class="idref" href="http://coq.inria.fr/distrib/8.5/stdlib/Coq.Init.Datatypes.html#3dcaec3b772747610227247939f96b01"><span class="id" title="notation">)</span></a>.<br/>
+
+<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+
+<div class="paragraph"> </div>
+
+A <span class="inlinecode"><a class="idref" href="Decidable.html#DecidableProp"><span class="id" title="record">DecidableProp</span></a></span> <span class="inlinecode"><a class="idref" href="CastMonad.html#A"><span class="id" title="variable">A</span></a></span> is, essentially, isomorphic to <span class="inlinecode"><span class="id" title="library">Bool</span></span>: it is
+either <span class="inlinecode"><a class="idref" href="http://coq.inria.fr/distrib/8.5/stdlib/Coq.Init.Datatypes.html#true"><span class="id" title="constructor">true</span></a></span> or <span class="inlinecode"><a class="idref" href="http://coq.inria.fr/distrib/8.5/stdlib/Coq.Init.Datatypes.html#false"><span class="id" title="constructor">false</span></a></span>.
+
+<div class="paragraph"> </div>
+
+ 
+</div>
+<div class="code">
+
+<br/>
+<span class="id" title="keyword">Class</span> <a name="DecidableProp"><span class="id" title="record">DecidableProp</span></a> (<span class="id" title="var">A</span> : <span class="id" title="keyword">Type</span>) := {<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<a name="dec_p"><span class="id" title="projection">dec_p</span></a> :&gt; <a class="idref" href="Decidable.html#Decidable"><span class="id" title="class">Decidable</span></a> <a class="idref" href="Decidable.html#A"><span class="id" title="variable">A</span></a>;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<a name="is_hprop_p"><span class="id" title="projection">is_hprop_p</span></a> :&gt; <a class="idref" href="HoTT.html#IsHProp"><span class="id" title="class">IsHProp</span></a> <a class="idref" href="Decidable.html#A"><span class="id" title="variable">A</span></a> }.<br/>
+
+<br/>
+<span class="id" title="keyword">Instance</span> <a name="DecidableProp_Decidable_HProp"><span class="id" title="instance">DecidableProp_Decidable_HProp</span></a> (<span class="id" title="var">A</span> : <span class="id" title="keyword">Type</span>) {<span class="id" title="var">Hdec</span>: <a class="idref" href="Decidable.html#Decidable"><span class="id" title="class">Decidable</span></a> <a class="idref" href="Decidable.html#A"><span class="id" title="variable">A</span></a>}<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{<span class="id" title="var">Hprop</span>:<a class="idref" href="HoTT.html#IsHProp"><span class="id" title="class">IsHProp</span></a> <a class="idref" href="Decidable.html#A"><span class="id" title="variable">A</span></a>} : <a class="idref" href="Decidable.html#DecidableProp"><span class="id" title="class">DecidableProp</span></a> <a class="idref" href="Decidable.html#A"><span class="id" title="variable">A</span></a> :=<br/>
+&nbsp;&nbsp;{|<a class="idref" href="Decidable.html#Build_DecidableProp"><span class="id" title="constructor">dec_p</span></a> <a class="idref" href="Decidable.html#Build_DecidableProp"><span class="id" title="constructor">:=</span></a> <a class="idref" href="Decidable.html#Build_DecidableProp"><span class="id" title="constructor">Hdec</span></a> <a class="idref" href="Decidable.html#Build_DecidableProp"><span class="id" title="constructor">;</span></a> <a class="idref" href="Decidable.html#Build_DecidableProp"><span class="id" title="constructor">is_hprop_p</span></a> <a class="idref" href="Decidable.html#Build_DecidableProp"><span class="id" title="constructor">:=</span></a> <a class="idref" href="Decidable.html#Build_DecidableProp"><span class="id" title="constructor">Hprop</span></a> |}.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+
+<div class="paragraph"> </div>
+
+The canonical example of a <span class="inlinecode"><a class="idref" href="Decidable.html#DecidableProp"><span class="id" title="record">DecidableProp</span></a></span> is the decidable equality
+for a type <span class="inlinecode"><a class="idref" href="CastMonad.html#A"><span class="id" title="variable">A</span></a></span>, as per Hedberg theorem. We package it in a dedicated
+class.
+
+<div class="paragraph"> </div>
+
+
+</div>
+<div class="code">
+
+<br/>
+<span class="id" title="keyword">Class</span> <a name="DecidablePaths"><span class="id" title="record">DecidablePaths</span></a> (<span class="id" title="var">A</span> : <span class="id" title="keyword">Type</span>) := { <br/>
+&nbsp;&nbsp;<a name="dec_paths"><span class="id" title="projection">dec_paths</span></a> : <span class="id" title="keyword">∀</span> <span class="id" title="var">a</span> <span class="id" title="var">b</span> : <a class="idref" href="Decidable.html#A"><span class="id" title="variable">A</span></a>, <a class="idref" href="Decidable.html#Decidable"><span class="id" title="class">Decidable</span></a> (<a class="idref" href="Decidable.html#a"><span class="id" title="variable">a</span></a> <a class="idref" href="http://coq.inria.fr/distrib/8.5/stdlib/Coq.Init.Logic.html#1c39bf18749e5cc609e83c0a0ba5a372"><span class="id" title="notation">=</span></a> <a class="idref" href="Decidable.html#b"><span class="id" title="variable">b</span></a>) <br/>
+}.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+
+<div class="paragraph"> </div>
+
+Hedberg theorem is a standard theorem of HoTT: it states that if a
+type <span class="inlinecode"><a class="idref" href="CastMonad.html#A"><span class="id" title="variable">A</span></a></span> has decidable equality, then it is a hSet, i.e. its equality
+is proof-irrelevant. See the proof at <span class="inlinecode"><span class="id" title="var">https</span>://<span class="id" title="var">github.com</span>/<a class="idref" href="HoTT.html#"><span class="id" title="library">HoTT</span></a></span> in
+<span class="inlinecode"><a class="idref" href="HoTT.html#"><span class="id" title="library">HoTT</span></a>/<span class="id" title="var">theories</span>/<span class="id" title="var">Basics</span>/<span class="id" title="var">Decidable.v</span></span> 
+</div>
+<div class="code">
+
+<br/>
+<span class="id" title="keyword">Instance</span> <a name="Hedberg"><span class="id" title="instance">Hedberg</span></a> (<span class="id" title="var">A</span> : <span class="id" title="keyword">Type</span>) `{<a class="idref" href="Decidable.html#DecidablePaths"><span class="id" title="class">DecidablePaths</span></a> <a class="idref" href="Decidable.html#A"><span class="id" title="variable">A</span></a>} : <a class="idref" href="HoTT.html#IsHSet"><span class="id" title="class">IsHSet</span></a> <a class="idref" href="Decidable.html#A"><span class="id" title="variable">A</span></a>.<br/>
+ 
+<br/>
+<span class="id" title="keyword">Instance</span> <a name="DecidablePaths_DecidableProp"><span class="id" title="instance">DecidablePaths_DecidableProp</span></a> <span class="id" title="var">A</span><br/>
+&nbsp;&nbsp;&nbsp;(<span class="id" title="var">DecidablePaths_A</span> : <a class="idref" href="Decidable.html#DecidablePaths"><span class="id" title="class">DecidablePaths</span></a> <a class="idref" href="Decidable.html#A"><span class="id" title="variable">A</span></a>)<br/>
+&nbsp;&nbsp;: <span class="id" title="keyword">∀</span> (<span class="id" title="var">a</span> <span class="id" title="var">b</span> : <a class="idref" href="Decidable.html#A"><span class="id" title="variable">A</span></a>), <a class="idref" href="Decidable.html#DecidableProp"><span class="id" title="class">DecidableProp</span></a> (<a class="idref" href="Decidable.html#a"><span class="id" title="variable">a</span></a> <a class="idref" href="http://coq.inria.fr/distrib/8.5/stdlib/Coq.Init.Logic.html#1c39bf18749e5cc609e83c0a0ba5a372"><span class="id" title="notation">=</span></a> <a class="idref" href="Decidable.html#b"><span class="id" title="variable">b</span></a>).<br/>
+<span class="id" title="keyword">Defined</span>.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+<a name="lab19"></a><h2 class="section">Checkability</h2>
+
+</div>
+<div class="code">
+
+<br/>
+<span class="id" title="keyword">Class</span> <a name="Checkable"><span class="id" title="record">Checkable</span></a> (<span class="id" title="var">A</span> : <span class="id" title="keyword">Type</span>) :=<br/>
+&nbsp;&nbsp;{<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<a name="checkP"><span class="id" title="projection">checkP</span></a> : <span class="id" title="keyword">Type</span>;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<a name="checkP_dec"><span class="id" title="projection">checkP_dec</span></a> : <a class="idref" href="Decidable.html#Decidable"><span class="id" title="class">Decidable</span></a> <a class="idref" href="Decidable.html#checkP"><span class="id" title="method">checkP</span></a> ;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<a name="convert"><span class="id" title="projection">convert</span></a> : <a class="idref" href="Decidable.html#checkP"><span class="id" title="method">checkP</span></a> <a class="idref" href="http://coq.inria.fr/distrib/8.5/stdlib/Coq.Init.Logic.html#d43e996736952df71ebeeae74d10a287"><span class="id" title="notation">→</span></a> <a class="idref" href="Decidable.html#A"><span class="id" title="variable">A</span></a><br/>
+&nbsp;&nbsp;}.<br/>
+
+<br/>
+<span class="id" title="keyword">Class</span> <a name="CheckableProp"><span class="id" title="record">CheckableProp</span></a> (<span class="id" title="var">A</span> : <span class="id" title="keyword">Type</span>) := {<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<a name="check"><span class="id" title="projection">check</span></a> :&gt; <a class="idref" href="Decidable.html#Checkable"><span class="id" title="class">Checkable</span></a> <a class="idref" href="Decidable.html#A"><span class="id" title="variable">A</span></a>;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<a name="is_hprop_c"><span class="id" title="projection">is_hprop_c</span></a> :&gt; <a class="idref" href="HoTT.html#IsHProp"><span class="id" title="class">IsHProp</span></a> <a class="idref" href="Decidable.html#A"><span class="id" title="variable">A</span></a> }.<br/>
+
+<br/>
+<span class="id" title="keyword">Instance</span> <a name="checkable_decidable"><span class="id" title="instance">checkable_decidable</span></a> (<span class="id" title="var">A</span> : <span class="id" title="keyword">Type</span>) {<span class="id" title="var">H</span>:<a class="idref" href="Decidable.html#Checkable"><span class="id" title="class">Checkable</span></a> <a class="idref" href="Decidable.html#A"><span class="id" title="variable">A</span></a>} : <a class="idref" href="Decidable.html#Decidable"><span class="id" title="class">Decidable</span></a> (@<a class="idref" href="Decidable.html#checkP"><span class="id" title="method">checkP</span></a> <span class="id" title="var">_</span> <a class="idref" href="Decidable.html#H"><span class="id" title="variable">H</span></a>)<br/>
+&nbsp;&nbsp;:= <a class="idref" href="Decidable.html#checkP_dec"><span class="id" title="method">checkP_dec</span></a>.<br/>
+
+<br/>
+<span class="id" title="keyword">Instance</span> <a name="decidable_is_checkable"><span class="id" title="instance">decidable_is_checkable</span></a> (<span class="id" title="var">A</span> : <span class="id" title="keyword">Type</span>) {<span class="id" title="var">H</span>:<a class="idref" href="Decidable.html#Decidable"><span class="id" title="class">Decidable</span></a> <a class="idref" href="Decidable.html#A"><span class="id" title="variable">A</span></a>} : <a class="idref" href="Decidable.html#Checkable"><span class="id" title="class">Checkable</span></a> <a class="idref" href="Decidable.html#A"><span class="id" title="variable">A</span></a><br/>
+&nbsp;&nbsp;:= {| <a class="idref" href="Decidable.html#Build_Checkable"><span class="id" title="constructor">checkP</span></a> <a class="idref" href="Decidable.html#Build_Checkable"><span class="id" title="constructor">:=</span></a> <a class="idref" href="Decidable.html#Build_Checkable"><span class="id" title="constructor">A</span></a> <a class="idref" href="Decidable.html#Build_Checkable"><span class="id" title="constructor">;</span></a> <a class="idref" href="Decidable.html#Build_Checkable"><span class="id" title="constructor">checkP_dec</span></a> <a class="idref" href="Decidable.html#Build_Checkable"><span class="id" title="constructor">:=</span></a> <a class="idref" href="Decidable.html#Build_Checkable"><span class="id" title="constructor">H</span></a> <a class="idref" href="Decidable.html#Build_Checkable"><span class="id" title="constructor">;</span></a> <a class="idref" href="Decidable.html#Build_Checkable"><span class="id" title="constructor">convert</span></a> <a class="idref" href="Decidable.html#Build_Checkable"><span class="id" title="constructor">:=</span></a> <a class="idref" href="Decidable.html#Build_Checkable"><span class="id" title="constructor">id</span></a> |}.<br/>
+
+<br/>
+<span class="id" title="keyword">Instance</span> <a name="decidablep_is_checkableprop"><span class="id" title="instance">decidablep_is_checkableprop</span></a> (<span class="id" title="var">A</span> : <span class="id" title="keyword">Type</span>) {<span class="id" title="var">H</span>:<a class="idref" href="Decidable.html#DecidableProp"><span class="id" title="class">DecidableProp</span></a> <a class="idref" href="Decidable.html#A"><span class="id" title="variable">A</span></a>} : <a class="idref" href="Decidable.html#CheckableProp"><span class="id" title="class">CheckableProp</span></a> <a class="idref" href="Decidable.html#A"><span class="id" title="variable">A</span></a><br/>
+&nbsp;&nbsp;:= {| <a class="idref" href="Decidable.html#Build_CheckableProp"><span class="id" title="constructor">is_hprop_c</span></a> <a class="idref" href="Decidable.html#Build_CheckableProp"><span class="id" title="constructor">:=</span></a> <a class="idref" href="Decidable.html#Build_CheckableProp"><span class="id" title="constructor">_</span></a> |}.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+<a name="lab20"></a><h2 class="section">A few instances</h2>
+
+</div>
+<div class="code">
+
+<br/>
+<span class="id" title="keyword">Set Implicit Arguments</span>.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+<a name="lab21"></a><h3 class="section">Reflecting a boolean as a decidable property</h3>
+
+</div>
+<div class="code">
+
+<br/>
+<span class="id" title="keyword">Instance</span> <a name="Decidable_bool"><span class="id" title="instance">Decidable_bool</span></a> (<span class="id" title="var">t</span> : <a class="idref" href="http://coq.inria.fr/distrib/8.5/stdlib/Coq.Init.Datatypes.html#bool"><span class="id" title="inductive">bool</span></a>) : <a class="idref" href="Decidable.html#Decidable"><span class="id" title="class">Decidable</span></a> (<a class="idref" href="HoTT.html#Is_true"><span class="id" title="definition">Is_true</span></a> <a class="idref" href="Decidable.html#t"><span class="id" title="variable">t</span></a>) :=<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">match</span> <span class="id" title="var">t</span> <span class="id" title="keyword">with</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;| <a class="idref" href="http://coq.inria.fr/distrib/8.5/stdlib/Coq.Init.Datatypes.html#true"><span class="id" title="constructor">true</span></a> ⇒ <a class="idref" href="http://coq.inria.fr/distrib/8.5/stdlib/Coq.Init.Datatypes.html#inl"><span class="id" title="constructor">inl</span></a> <a class="idref" href="http://coq.inria.fr/distrib/8.5/stdlib/Coq.Init.Datatypes.html#tt"><span class="id" title="constructor">tt</span></a><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;| <a class="idref" href="http://coq.inria.fr/distrib/8.5/stdlib/Coq.Init.Datatypes.html#false"><span class="id" title="constructor">false</span></a> ⇒ <a class="idref" href="http://coq.inria.fr/distrib/8.5/stdlib/Coq.Init.Datatypes.html#inr"><span class="id" title="constructor">inr</span></a> <a class="idref" href="http://coq.inria.fr/distrib/8.5/stdlib/Coq.Init.Datatypes.html#id"><span class="id" title="definition">id</span></a><br/>
+&nbsp;&nbsp;<span class="id" title="keyword">end</span>.<br/>
+
+<br/>
+
+<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+<a name="lab22"></a><h3 class="section">Instances for bool</h3>
+
+</div>
+<div class="code">
+
+<br/>
+<span class="id" title="keyword">Instance</span> <a name="Decidable_eq_bool"><span class="id" title="instance">Decidable_eq_bool</span></a> : <span class="id" title="keyword">∀</span> (<span class="id" title="var">x</span> <span class="id" title="var">y</span> : <a class="idref" href="http://coq.inria.fr/distrib/8.5/stdlib/Coq.Init.Datatypes.html#bool"><span class="id" title="inductive">bool</span></a>), <a class="idref" href="Decidable.html#Decidable"><span class="id" title="class">Decidable</span></a> (<a class="idref" href="http://coq.inria.fr/distrib/8.5/stdlib/Coq.Init.Logic.html#eq"><span class="id" title="inductive">eq</span></a> <a class="idref" href="Decidable.html#x"><span class="id" title="variable">x</span></a> <a class="idref" href="Decidable.html#y"><span class="id" title="variable">y</span></a>).<br/>
+<span class="id" title="keyword">Defined</span>.<br/>
+
+<br/>
+<span class="id" title="keyword">Instance</span> <a name="DecidablePaths_bool"><span class="id" title="instance">DecidablePaths_bool</span></a> : <a class="idref" href="Decidable.html#DecidablePaths"><span class="id" title="class">DecidablePaths</span></a> <a class="idref" href="http://coq.inria.fr/distrib/8.5/stdlib/Coq.Init.Datatypes.html#bool"><span class="id" title="inductive">bool</span></a> := <br/>
+&nbsp;&nbsp;{ <a class="idref" href="Decidable.html#dec_paths"><span class="id" title="method">dec_paths</span></a> := <a class="idref" href="Decidable.html#Decidable_eq_bool"><span class="id" title="instance">Decidable_eq_bool</span></a> }.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+<a name="lab23"></a><h3 class="section">Instances for nat</h3>
+
+</div>
+<div class="code">
+
+<br/>
+<span class="id" title="keyword">Instance</span> <a name="Decidable_eq_nat"><span class="id" title="instance">Decidable_eq_nat</span></a> : <span class="id" title="keyword">∀</span> (<span class="id" title="var">x</span> <span class="id" title="var">y</span> : <a class="idref" href="http://coq.inria.fr/distrib/8.5/stdlib/Coq.Init.Datatypes.html#nat"><span class="id" title="inductive">nat</span></a>), <a class="idref" href="Decidable.html#Decidable"><span class="id" title="class">Decidable</span></a> (<a class="idref" href="http://coq.inria.fr/distrib/8.5/stdlib/Coq.Init.Logic.html#eq"><span class="id" title="inductive">eq</span></a> <a class="idref" href="Decidable.html#x"><span class="id" title="variable">x</span></a> <a class="idref" href="Decidable.html#y"><span class="id" title="variable">y</span></a>).<br/>
+<span class="id" title="keyword">Defined</span>.<br/>
+
+<br/>
+<span class="id" title="keyword">Instance</span> <a name="DecidablePaths_nat"><span class="id" title="instance">DecidablePaths_nat</span></a> : <a class="idref" href="Decidable.html#DecidablePaths"><span class="id" title="class">DecidablePaths</span></a> <a class="idref" href="http://coq.inria.fr/distrib/8.5/stdlib/Coq.Init.Datatypes.html#nat"><span class="id" title="inductive">nat</span></a> := <br/>
+&nbsp;&nbsp;{ <a class="idref" href="Decidable.html#dec_paths"><span class="id" title="method">dec_paths</span></a> := <a class="idref" href="Decidable.html#Decidable_eq_nat"><span class="id" title="instance">Decidable_eq_nat</span></a> }.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+<a name="lab24"></a><h3 class="section">Instances for list</h3>
+
+</div>
+<div class="code">
+
+<br/>
+<span class="id" title="keyword">Instance</span> <a name="Decidable_eq_list"><span class="id" title="instance">Decidable_eq_list</span></a> : <span class="id" title="keyword">∀</span> <span class="id" title="var">A</span> (<span class="id" title="var">HA</span>: <a class="idref" href="Decidable.html#DecidablePaths"><span class="id" title="class">DecidablePaths</span></a> <a class="idref" href="Decidable.html#A"><span class="id" title="variable">A</span></a>) <br/>
+&nbsp;&nbsp;(<span class="id" title="var">x</span> <span class="id" title="var">y</span>: <a class="idref" href="http://coq.inria.fr/distrib/8.5/stdlib/Coq.Init.Datatypes.html#list"><span class="id" title="inductive">list</span></a> <a class="idref" href="Decidable.html#A"><span class="id" title="variable">A</span></a>), <a class="idref" href="Decidable.html#Decidable"><span class="id" title="class">Decidable</span></a> (<a class="idref" href="http://coq.inria.fr/distrib/8.5/stdlib/Coq.Init.Logic.html#eq"><span class="id" title="inductive">eq</span></a> <a class="idref" href="Decidable.html#x"><span class="id" title="variable">x</span></a> <a class="idref" href="Decidable.html#y"><span class="id" title="variable">y</span></a>).<br/>
+<span class="id" title="keyword">Defined</span>.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+<a name="lab25"></a><h3 class="section">Instance for decidable equality on list</h3>
+
+</div>
+<div class="code">
+
+<br/>
+<span class="id" title="keyword">Instance</span> <a name="DecidablePaths_list"><span class="id" title="instance">DecidablePaths_list</span></a> : <br/>
+&nbsp;&nbsp;<span class="id" title="keyword">∀</span> <span class="id" title="var">A</span> (<span class="id" title="var">HA</span>: <a class="idref" href="Decidable.html#DecidablePaths"><span class="id" title="class">DecidablePaths</span></a> <a class="idref" href="Decidable.html#A"><span class="id" title="variable">A</span></a>), <a class="idref" href="Decidable.html#DecidablePaths"><span class="id" title="class">DecidablePaths</span></a> (<a class="idref" href="http://coq.inria.fr/distrib/8.5/stdlib/Coq.Init.Datatypes.html#list"><span class="id" title="inductive">list</span></a> <a class="idref" href="Decidable.html#A"><span class="id" title="variable">A</span></a>) := <br/>
+&nbsp;&nbsp;&nbsp;&nbsp;{ <a class="idref" href="Decidable.html#dec_paths"><span class="id" title="method">dec_paths</span></a> := <a class="idref" href="Decidable.html#Decidable_eq_list"><span class="id" title="instance">Decidable_eq_list</span></a> <span class="id" title="var">HA</span> }.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+<a name="lab26"></a><h3 class="section">Instance for less than</h3>
+
+</div>
+<div class="code">
+
+<br/>
+<span class="id" title="keyword">Instance</span> <a name="Decidable_le_nat"><span class="id" title="instance">Decidable_le_nat</span></a> : <span class="id" title="keyword">∀</span> (<span class="id" title="var">x</span> <span class="id" title="var">y</span> : <a class="idref" href="http://coq.inria.fr/distrib/8.5/stdlib/Coq.Init.Datatypes.html#nat"><span class="id" title="inductive">nat</span></a>), <a class="idref" href="Decidable.html#Decidable"><span class="id" title="class">Decidable</span></a> (<a class="idref" href="Decidable.html#x"><span class="id" title="variable">x</span></a> <a class="idref" href="http://coq.inria.fr/distrib/8.5/stdlib/Coq.Init.Peano.html#9b077c369e19739ef880736ba34623ff"><span class="id" title="notation">≤</span></a> <a class="idref" href="Decidable.html#y"><span class="id" title="variable">y</span></a>).<br/>
+<span class="id" title="keyword">Defined</span>.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+<a name="lab27"></a><h3 class="section">Instances for option</h3>
+
+</div>
+<div class="code">
+
+<br/>
+<span class="id" title="keyword">Instance</span> <a name="Decidable_eq_option"><span class="id" title="instance">Decidable_eq_option</span></a> : <span class="id" title="keyword">∀</span> <span class="id" title="var">A</span> (<span class="id" title="var">HA</span>: <a class="idref" href="Decidable.html#DecidablePaths"><span class="id" title="class">DecidablePaths</span></a> <a class="idref" href="Decidable.html#A"><span class="id" title="variable">A</span></a>) <br/>
+&nbsp;&nbsp;(<span class="id" title="var">x</span> <span class="id" title="var">y</span>: <a class="idref" href="http://coq.inria.fr/distrib/8.5/stdlib/Coq.Init.Datatypes.html#option"><span class="id" title="inductive">option</span></a> <a class="idref" href="Decidable.html#A"><span class="id" title="variable">A</span></a>), <a class="idref" href="Decidable.html#Decidable"><span class="id" title="class">Decidable</span></a> (<a class="idref" href="http://coq.inria.fr/distrib/8.5/stdlib/Coq.Init.Logic.html#eq"><span class="id" title="inductive">eq</span></a> <a class="idref" href="Decidable.html#x"><span class="id" title="variable">x</span></a> <a class="idref" href="Decidable.html#y"><span class="id" title="variable">y</span></a>).<br/>
+<span class="id" title="keyword">Defined</span>.<br/>
+
+<br/>
+<span class="id" title="keyword">Instance</span> <a name="DecidablePaths_option"><span class="id" title="instance">DecidablePaths_option</span></a> :<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">∀</span> <span class="id" title="var">A</span> (<span class="id" title="var">HA</span>: <a class="idref" href="Decidable.html#DecidablePaths"><span class="id" title="class">DecidablePaths</span></a> <a class="idref" href="Decidable.html#A"><span class="id" title="variable">A</span></a>), <a class="idref" href="Decidable.html#DecidablePaths"><span class="id" title="class">DecidablePaths</span></a> (<a class="idref" href="http://coq.inria.fr/distrib/8.5/stdlib/Coq.Init.Datatypes.html#option"><span class="id" title="inductive">option</span></a> <a class="idref" href="Decidable.html#A"><span class="id" title="variable">A</span></a>) := <br/>
+&nbsp;&nbsp;&nbsp;&nbsp;{ <a class="idref" href="Decidable.html#dec_paths"><span class="id" title="method">dec_paths</span></a> := <a class="idref" href="Decidable.html#Decidable_eq_option"><span class="id" title="instance">Decidable_eq_option</span></a> <span class="id" title="var">HA</span> }.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+<a name="lab28"></a><h3 class="section">Instances for logical connectives</h3>
+
+</div>
+<div class="code">
+
+<br/>
+<span class="id" title="keyword">Instance</span> <a name="Decidable_and"><span class="id" title="instance">Decidable_and</span></a> <span class="id" title="var">P</span> <span class="id" title="var">Q</span> (<span class="id" title="var">HP</span> : <a class="idref" href="Decidable.html#Decidable"><span class="id" title="class">Decidable</span></a> <a class="idref" href="Decidable.html#P"><span class="id" title="variable">P</span></a>) <br/>
+&nbsp;(<span class="id" title="var">HQ</span> : <a class="idref" href="Decidable.html#Decidable"><span class="id" title="class">Decidable</span></a> <a class="idref" href="Decidable.html#Q"><span class="id" title="variable">Q</span></a>) : <a class="idref" href="Decidable.html#Decidable"><span class="id" title="class">Decidable</span></a> (<a class="idref" href="Decidable.html#P"><span class="id" title="variable">P</span></a> <a class="idref" href="http://coq.inria.fr/distrib/8.5/stdlib/Coq.Init.Datatypes.html#d19c7eafd0e2d195d10df94b392087b5"><span class="id" title="notation">×</span></a> <a class="idref" href="Decidable.html#Q"><span class="id" title="variable">Q</span></a>).<br/>
+<span class="id" title="keyword">Defined</span>.<br/>
+
+<br/>
+<span class="id" title="keyword">Instance</span> <a name="Decidable_or"><span class="id" title="instance">Decidable_or</span></a> <span class="id" title="var">P</span> <span class="id" title="var">Q</span> (<span class="id" title="var">HP</span> : <a class="idref" href="Decidable.html#Decidable"><span class="id" title="class">Decidable</span></a> <a class="idref" href="Decidable.html#P"><span class="id" title="variable">P</span></a>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">HQ</span> : <a class="idref" href="Decidable.html#Decidable"><span class="id" title="class">Decidable</span></a> <a class="idref" href="Decidable.html#Q"><span class="id" title="variable">Q</span></a>) : <a class="idref" href="Decidable.html#Decidable"><span class="id" title="class">Decidable</span></a> (<a class="idref" href="Decidable.html#P"><span class="id" title="variable">P</span></a> <a class="idref" href="http://coq.inria.fr/distrib/8.5/stdlib/Coq.Init.Datatypes.html#3dcaec3b772747610227247939f96b01"><span class="id" title="notation">+</span></a> <a class="idref" href="Decidable.html#Q"><span class="id" title="variable">Q</span></a>).<br/>
+<span class="id" title="keyword">Defined</span>.<br/>
+
+<br/>
+<span class="id" title="keyword">Instance</span> <a name="Decidable_not"><span class="id" title="instance">Decidable_not</span></a> <span class="id" title="var">P</span> (<span class="id" title="var">HP</span> : <a class="idref" href="Decidable.html#Decidable"><span class="id" title="class">Decidable</span></a> <a class="idref" href="Decidable.html#P"><span class="id" title="variable">P</span></a>) : <br/>
+&nbsp;&nbsp;<a class="idref" href="Decidable.html#Decidable"><span class="id" title="class">Decidable</span></a> (<a class="idref" href="HoTT.html#not"><span class="id" title="definition">not</span></a> <a class="idref" href="Decidable.html#P"><span class="id" title="variable">P</span></a>).<br/>
+<span class="id" title="keyword">Defined</span>.<br/>
+
+<br/>
+<span class="id" title="keyword">Instance</span> <a name="Decidable_implies"><span class="id" title="instance">Decidable_implies</span></a> <span class="id" title="var">P</span> <span class="id" title="var">Q</span> (<span class="id" title="var">HP</span> : <a class="idref" href="Decidable.html#Decidable"><span class="id" title="class">Decidable</span></a> <a class="idref" href="Decidable.html#P"><span class="id" title="variable">P</span></a>) <br/>
+&nbsp;&nbsp;(<span class="id" title="var">HQ</span> : <a class="idref" href="Decidable.html#Decidable"><span class="id" title="class">Decidable</span></a> <a class="idref" href="Decidable.html#Q"><span class="id" title="variable">Q</span></a>) : <a class="idref" href="Decidable.html#Decidable"><span class="id" title="class">Decidable</span></a> (<a class="idref" href="Decidable.html#P"><span class="id" title="variable">P</span></a> <a class="idref" href="http://coq.inria.fr/distrib/8.5/stdlib/Coq.Init.Logic.html#d43e996736952df71ebeeae74d10a287"><span class="id" title="notation">→</span></a> <a class="idref" href="Decidable.html#Q"><span class="id" title="variable">Q</span></a>).<br/>
+<span class="id" title="keyword">Defined</span>.<br/>
+
+<br/>
+<span class="id" title="keyword">Instance</span> <a name="Decidable_True"><span class="id" title="instance">Decidable_True</span></a> : <a class="idref" href="Decidable.html#Decidable"><span class="id" title="class">Decidable</span></a> <a class="idref" href="http://coq.inria.fr/distrib/8.5/stdlib/Coq.Init.Logic.html#True"><span class="id" title="inductive">True</span></a> := <a class="idref" href="http://coq.inria.fr/distrib/8.5/stdlib/Coq.Init.Datatypes.html#inl"><span class="id" title="constructor">inl</span></a> <a class="idref" href="http://coq.inria.fr/distrib/8.5/stdlib/Coq.Init.Logic.html#I"><span class="id" title="constructor">I</span></a>.<br/>
+
+<br/>
+<span class="id" title="keyword">Instance</span> <a name="Decidable_False"><span class="id" title="instance">Decidable_False</span></a> : <a class="idref" href="Decidable.html#Decidable"><span class="id" title="class">Decidable</span></a> <a class="idref" href="http://coq.inria.fr/distrib/8.5/stdlib/Coq.Init.Logic.html#False"><span class="id" title="inductive">False</span></a>.<br/>
+<span class="id" title="keyword">Defined</span>.<br/>
+
+<br/>
+<span class="id" title="keyword">Instance</span> <a name="DecidablePaths_unit"><span class="id" title="instance">DecidablePaths_unit</span></a> : <a class="idref" href="Decidable.html#DecidablePaths"><span class="id" title="class">DecidablePaths</span></a> <a class="idref" href="http://coq.inria.fr/distrib/8.5/stdlib/Coq.Init.Datatypes.html#unit"><span class="id" title="inductive">unit</span></a>.<br/>
+<span class="id" title="keyword">Defined</span>.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+<a name="lab29"></a><h3 class="section">Decidability of proven properties</h3>
+
+</div>
+<div class="code">
+
+<br/>
+<span class="id" title="keyword">Instance</span> <a name="Decidable_proven"><span class="id" title="instance">Decidable_proven</span></a> (<span class="id" title="var">P</span> : <span class="id" title="keyword">Type</span>) (<span class="id" title="var">ev</span> :  <a class="idref" href="Decidable.html#P"><span class="id" title="variable">P</span></a>):  <a class="idref" href="Decidable.html#Decidable"><span class="id" title="class">Decidable</span></a> <a class="idref" href="Decidable.html#P"><span class="id" title="variable">P</span></a> :=<br/>
+&nbsp;&nbsp;<a class="idref" href="http://coq.inria.fr/distrib/8.5/stdlib/Coq.Init.Datatypes.html#inl"><span class="id" title="constructor">inl</span></a> <span class="id" title="var">ev</span>.<br/>
+
+<br/>
+<span class="id" title="keyword">Instance</span> <a name="DecidablePaths_prod"><span class="id" title="instance">DecidablePaths_prod</span></a> <span class="id" title="var">A</span> <span class="id" title="var">B</span> `{<a class="idref" href="Decidable.html#DecidablePaths"><span class="id" title="class">DecidablePaths</span></a> <a class="idref" href="Decidable.html#A"><span class="id" title="variable">A</span></a>} `{<a class="idref" href="Decidable.html#DecidablePaths"><span class="id" title="class">DecidablePaths</span></a> <a class="idref" href="Decidable.html#B"><span class="id" title="variable">B</span></a>}:<br/>
+&nbsp;&nbsp;<a class="idref" href="Decidable.html#DecidablePaths"><span class="id" title="class">DecidablePaths</span></a> (<a class="idref" href="Decidable.html#A"><span class="id" title="variable">A</span></a><a class="idref" href="http://coq.inria.fr/distrib/8.5/stdlib/Coq.Init.Datatypes.html#d19c7eafd0e2d195d10df94b392087b5"><span class="id" title="notation">×</span></a><a class="idref" href="Decidable.html#B"><span class="id" title="variable">B</span></a>).<br/>
+<span class="id" title="keyword">Defined</span>.<br/>
+
+<br/>
+<span class="id" title="keyword">Instance</span> <a name="DecidablePaths_fun"><span class="id" title="instance">DecidablePaths_fun</span></a> <span class="id" title="var">A</span> <span class="id" title="var">B</span> <span class="id" title="var">A'</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="var">H</span> : <span class="id" title="keyword">∀</span> <span class="id" title="var">a</span>, <a class="idref" href="Decidable.html#DecidablePaths"><span class="id" title="class">DecidablePaths</span></a> (<a class="idref" href="Decidable.html#B"><span class="id" title="variable">B</span></a> <a class="idref" href="Decidable.html#a"><span class="id" title="variable">a</span></a>)) (<span class="id" title="var">f</span> : <a class="idref" href="Decidable.html#A'"><span class="id" title="variable">A'</span></a> <a class="idref" href="http://coq.inria.fr/distrib/8.5/stdlib/Coq.Init.Logic.html#d43e996736952df71ebeeae74d10a287"><span class="id" title="notation">→</span></a> <a class="idref" href="Decidable.html#A"><span class="id" title="variable">A</span></a>)<br/>
+&nbsp;&nbsp;<span class="id" title="var">a'</span> : <a class="idref" href="Decidable.html#DecidablePaths"><span class="id" title="class">DecidablePaths</span></a> (<a class="idref" href="Decidable.html#B"><span class="id" title="variable">B</span></a> (<a class="idref" href="Decidable.html#f"><span class="id" title="variable">f</span></a> <a class="idref" href="Decidable.html#a'"><span class="id" title="variable">a'</span></a>)) .<br/>
+
+<br/>
+</div>
+</div>
+
+<div id="footer">
+<hr/><a href="index.html">Index</a><hr/>This page has been generated by <a href="http://coq.inria.fr/">coqdoc</a>
+</div>
+
+</div>
+
+</body>
+</html>
