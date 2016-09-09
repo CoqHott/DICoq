@@ -13,11 +13,19 @@ To compile:
 To run the example:
 
 $ ocaml -init distack.ml
+
 > (exec 0 0 (IPlus 0) [1;2] : int list);;
+
 	int list = [3]
+
 > exec 0 0 (IPlus 0) [];;
+
 	Segmentation fault: 11 
+
 > simple_exec NPlus [1;2];;
+
 	int list = [3]
+
 > simple_exec NPlus [];;
+
 	Exception: (Failure "Cast failure: invalid instruction").   
