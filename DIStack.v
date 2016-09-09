@@ -52,7 +52,7 @@ Eval compute in exec 2 _ IPlus (2, (1, tt)).
    and the condition is expressed with the [valid_instr] predicate
    below (which is decidable).  *)
 
-Inductive instr@{i} : Type@{i} :=
+Inductive instr : Type :=
 | NConst : nat -> instr
 | NPlus  : instr.
 
@@ -245,7 +245,6 @@ Arguments lift2 {_ _ _ _ _ _ _ _ } _ _ _ _.
 Arguments HODepEquiv {_ _ _ _}  _ {_ _ _} _.
 Arguments HODepEquiv2 {_ _ _ _ _ _ _ _ _ _ _ _}  _ _.
 Arguments HODepEquiv2_sym {_ _ _ _ _ _ _ _ _ _ _} _. 
-Print simple_exec. 
 
 (*
 Definition sanity_check : simple_exec =
@@ -261,7 +260,7 @@ Definition sanity_check : simple_exec =
 Eval compute in simple_exec NPlus (1 :: 2 :: nil).
 Eval compute in simple_exec NPlus (1 :: nil).
 
-Print Assumptions simple_exec.
+(* Print Assumptions simple_exec. *)
 
 (** ** Extraction *)
 
@@ -272,19 +271,12 @@ Extraction "distack" cast_erasure exec simple_exec.
 
 (** 
 <<
-$ ocaml -init didstack.ml
+$ ocaml -init distack.ml
 # (exec 0 0 (IPlus 0) [1;2] : int list);;
 - : int list = [3]
 # exec 0 0 (IPlus 0) [];;
 Segmentation fault: 11 
->>
- *)
 
-(**
-<< 
-$ ocamlc didstack.mli didstack.ml
-# #load "didstack.cmo";;
-# open Didstack;;
 # simple_exec NPlus [1;2];;
 - : int list = [3]                                                                              
 # simple_exec NPlus [];;

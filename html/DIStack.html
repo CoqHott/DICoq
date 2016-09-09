@@ -104,7 +104,7 @@ The stach machine satisfies those depth invariants
 <div class="code">
 
 <br/>
-<span class="id" title="keyword">Inductive</span> <a name="instr"><span class="id" title="inductive">instr@</span></a>{<span class="id" title="var">i</span>} : <span class="id" title="var">Type@</span>{<span class="id" title="var">i</span>} :=<br/>
+<span class="id" title="keyword">Inductive</span> <a name="instr"><span class="id" title="inductive">instr</span></a> : <span class="id" title="keyword">Type</span> :=<br/>
 | <a name="NConst"><span class="id" title="constructor">NConst</span></a> : <a class="idref" href="http://coq.inria.fr/distrib/8.5/stdlib/Coq.Init.Datatypes.html#nat"><span class="id" title="inductive">nat</span></a> <a class="idref" href="http://coq.inria.fr/distrib/8.5/stdlib/Coq.Init.Logic.html#d43e996736952df71ebeeae74d10a287"><span class="id" title="notation">→</span></a> <a class="idref" href="DIStack.html#instr"><span class="id" title="inductive">instr</span></a><br/>
 | <a name="NPlus"><span class="id" title="constructor">NPlus</span></a>  : <a class="idref" href="DIStack.html#instr"><span class="id" title="inductive">instr</span></a>.<br/>
 
@@ -270,7 +270,6 @@ The stach machine satisfies those depth invariants
 <br/>
 
 <br/>
-<span class="id" title="keyword">Print</span> <a class="idref" href="DIStack.html#simple_exec"><span class="id" title="definition">simple_exec</span></a>.<br/>
 
 <br/>
 
@@ -279,7 +278,6 @@ The stach machine satisfies those depth invariants
 <span class="id" title="keyword">Eval</span> <span class="id" title="tactic">compute</span> <span class="id" title="keyword">in</span> <a class="idref" href="DIStack.html#simple_exec"><span class="id" title="definition">simple_exec</span></a> <a class="idref" href="DIStack.html#NPlus"><span class="id" title="constructor">NPlus</span></a> (1 <a class="idref" href="http://coq.inria.fr/distrib/8.5/stdlib/Coq.Init.Datatypes.html#0a8150c3c4df34d205c5ed9a427e2ed5"><span class="id" title="notation">::</span></a> <a class="idref" href="http://coq.inria.fr/distrib/8.5/stdlib/Coq.Init.Datatypes.html#nil"><span class="id" title="constructor">nil</span></a>).<br/>
 
 <br/>
-<span class="id" title="keyword">Print</span> <span class="id" title="keyword">Assumptions</span> <a class="idref" href="DIStack.html#simple_exec"><span class="id" title="definition">simple_exec</span></a>.<br/>
 
 <br/>
 </div>
@@ -305,22 +303,12 @@ The stach machine satisfies those depth invariants
 <div class="paragraph"> </div>
 
 <pre>
-$ ocaml -init didstack.ml
+$ ocaml -init distack.ml
 # (exec 0 0 (IPlus 0) [1;2] : int list);;
 - : int list = [3]
 # exec 0 0 (IPlus 0) [];;
 Segmentation fault: 11 
-</pre>
- 
-<div class="paragraph"> </div>
 
-
-<div class="paragraph"> </div>
-
-<pre>
-$ ocamlc didstack.mli didstack.ml
-# #load "didstack.cmo";;
-# open Didstack;;
 # simple_exec NPlus [1;2];;
 - : int list = [3]                                                                              
 # simple_exec NPlus [];;

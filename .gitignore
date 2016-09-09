@@ -1,3 +1,4 @@
+*.cmi
 *.vo
 *.glob
 *.v.d
