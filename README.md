@@ -3,7 +3,7 @@
 Dependent Interoperability for Coq
 
 The repository contains the companion code of the publication
-Partial Type Equivalences for Verified Dependent Interoperability (ICFP'16).
+"Foundations of Dependent Interoperability" (submitted to JFP).
 
 
 To compile:
