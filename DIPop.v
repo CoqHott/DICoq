@@ -7,12 +7,16 @@ Notation "x .1" := (projT1 x) (at level 3).
 Notation "x .2" := (projT2 x) (at level 3).  
 Notation " ( x ; p ) " := (existT _ x p).
  
+Arguments length {_} l.
 
 Set Universe Polymorphism.
 
-Definition vector A := Vector.t A.
+Instance Vector_HSet (A:HSet) n : IsHSet (Vector.t A n).
+Admitted. 
+
+Definition vector (A:HSet) : Hnat -> HSet := fun n => hset (Vector.t A n).
 Definition vnil {A} := Vector.nil A.
-Definition vcons {A n} (val:A) (v:vector A n) := Vector.cons A val _ v.
+Definition vcons {A:HSet} {n} (val:A) (v:vector A n) := Vector.cons A val _ v.
   
    
 (** * Pop from list *)
@@ -42,14 +46,14 @@ Definition bad_pop {A} (l: list A): list A :=
 >>
 *)
 
-Fixpoint vector_to_list A (n:nat):
+Fixpoint vector_to_list {A} (n:nat):
   Vector.t A n -> {l : list A & clift (length (A:=A))  l = Some n} :=
-  match n return Vector.t A n -> {l : list A & clift (info:=Cast_info) (length (A:=A))  l = Some n} with
+  match n return Vector.t A n -> {l : list A & clift (length (A:=A))  l = Some n} with
   | O => fun _ => (nil; eq_refl)
-  | S n => fun v => let IHn :=  vector_to_list A n (Vector.tl v) in
+  | S n => fun v => let IHn :=  vector_to_list n (Vector.tl v) in
            ((Vector.hd v) :: IHn.1 ; ap _ (ap S (Some_inj (IHn.2)))) end.
 
-Definition list_to_vector A (n:nat) : {l : list A & clift (info := Cast_info) (length (A:=A)) l = Some n} -> Vector.t A n.
+Definition list_to_vector {A:HSet} (n:nat) : {l : list A & clift (length (A:=A)) l = Some n} -> Vector.t A n.
   destruct 1 as [l H]. generalize dependent n. induction l; simpl; intros.
   - exact (Some_inj H # vnil).
   - exact (Some_inj H # vcons a (IHl (length l) eq_refl)). 
@@ -66,43 +70,45 @@ Definition S_length :
   intros; induction l; inversion H; simpl; reflexivity.
 Defined.
 
- 
-Instance DepEquiv_vector_list_simpl A `{Show A} `{DecidablePaths A}  :
-  (vector A) ≈ list A  :=
-  @DepEquiv_eq nat (vector A) (list A) _ _ _ (clift (length (A:=A)))
-              (vector_to_list A) (list_to_vector A) _ _ _.
+Definition list A  `{DecidablePaths A} := {| _typeS := list A |} : HSet.
+
+(* =DepEquiv_vector_list_simpl= *)
+Instance DepEquiv_vector_list_nat : vector Hnat ≲K□ list Hnat  :=
+  DepCoercion_eq (vector Hnat) (list Hnat) (clift length)
+                 vector_to_list list_to_vector.
+(* =end= *)
 Proof.
    - intro n. (* Sect (nvector_to_nlist a) (nlist_to_nvector a) *)
+     (* XXX: this proof is not manageable at the next truncation level *)
     induction n.
-    + intro v. apply Vector.case0. reflexivity.
-    + intro v. revert IHn. 
-      refine (Vector.caseS (fun n v => (∀ x : vector A n, list_to_vector A n (vector_to_list A n x) = x)
-                                                            → list_to_vector A (S n) (vector_to_list A (S n) v) = v) _ _).
-      clear. intros. simpl. rewrite Some_inj_sect. 
-      rewrite transport_vector.
-      apply ap. specialize (H t). destruct (vector_to_list A n t).
+    + intro v; induction v using Vector.case0.
+      reflexivity.
+    + intro v; induction n, v using Vector.caseS.
+      unfold id, compose in *; simpl in *. unfold creturn. 
+      rewrite Some_inj_sect. rewrite (transport_vector Hnat). 
+      apply ap. specialize (IHn t). destruct (vector_to_list n t).
       simpl in *. inversion e.
-      assert (e = ap Some H1). apply is_hprop. subst.
+      assert (e = ap Some H0) by apply is_hprop. subst.
       reflexivity.
   - intro n.  (* Sect (nlist_to_nvector a) (nvector_to_nlist a) *)
+    (* XXX: this proof is not manageable at the next truncation level *)
     induction n.
     + intro rl. simpl. destruct rl as [l Hl].
+      unfold compose, id; simpl.
       destruct l; try inversion Hl.
       refine (path_sigma_uncurried _ _ _ _).
       simple refine (existT _ _ _). reflexivity. apply is_hprop.
     + intro rl. destruct rl as [l Hl].
       destruct l; try inversion Hl.  
-      specialize (IHn (l;ap Some H2)). refine (path_sigma_uncurried _ _ _ _).
+      specialize (IHn (l;ap Some H0)). refine (path_sigma_uncurried _ _ _ _).
       simple refine (existT _ _ _). simpl. simpl in Hl.
-      assert (Hl = ap Some (ap S  H2)) by apply is_hprop.
-      rewrite H1. rewrite Some_inj_sect, transport_vector. apply ap.
-      destruct H2. exact IHn..1. apply is_hprop. 
+      assert (Hl = ap Some (ap S H0)) by apply is_hprop.
+      rewrite H. rewrite Some_inj_sect, (transport_vector Hnat). apply ap.
+      destruct H0. exact IHn..1. apply is_hprop. 
   - intros n v.
     induction n. reflexivity. simpl. unfold clift. apply ap.
     specialize (IHn(Vector.tl v)). inversion IHn. simpl. apply ap. assumption. 
 Defined.
-
-
     
 (** ** Monadic Liftings *)
 
@@ -111,10 +117,13 @@ Arguments Vector.tl {_} _ _.
 
 (** We simply lifting the domain *)
 
-Definition map_list (f : nat -> nat) : list nat ⇀ list nat :=
-  lift (Vector.map f).
+(* =map_list= *)
+Definition map_list (f : Hnat -> Hnat) : list Hnat ⇀ list Hnat := lift (Vector.map f).
+(* =end= *)
 
-Definition pop : list nat ⇀ list nat := lift (Vector.tl).
+(* =pop= *)
+Definition pop : list Hnat ⇀ list Hnat := 
+    lift (Vector.tl: forall n:Hnat, vector _ (S n) -> vector _ n).
+(* =end= *)
 
-Eval compute in (pop nil).
-
+Eval compute in (pop (2::3::nil)).

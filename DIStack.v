@@ -1,5 +1,4 @@
 Set Universe Polymorphism.
-
 Require Import Showable String Decidable List DepEquiv HODepEquiv HoTT.
 Local Open Scope string_scope.
 
@@ -8,33 +7,60 @@ Notation "x .1" := (projT1 x) (at level 3).
 Notation "x .2" := (projT2 x) (at level 3).  
 Notation " ( x ; p ) " := (existT _ x p).
 
+Arguments length {_} l.
 
 (** * Dependent Stack/Instr *)
 
 (** A [dstack] is a bunch of nested pairs of depth [n] *)
 
-Fixpoint dstack (n : nat) : Type :=
+Section TypeScopeSection.
+Local Open Scope type.
+(* =dstack= *)
+Fixpoint dstack (n : Hnat) : Type :=
   match n with
     | O => unit 
     | S n' => nat * dstack n'
-  end%type.
+  end.
+(* =end= *)
+Local Close Scope type.
+End TypeScopeSection.
+
+Definition _dstack_HSet n : IsHSet (dstack n).
+Admitted.
+
+Instance dstack_HSet n : IsHSet (dstack n) := _dstack_HSet n.
+
+Definition Hdstack n := hset (dstack n).
 
 (** The dependent instructions [dinstr] are explicit about their
 effect on the depth of the dstack *)
 
-Inductive dinstr : nat -> nat -> Type :=
-| IConst : forall (k:nat) {n}, dinstr n (S n)
-| IPlus : forall {n}, dinstr (S (S n)) (S n).
+(* =dinstr= *)
+Inductive dinstr : Hnat -> Hnat -> Type :=
+| IConst : forall n, nat -> dinstr n (S n)
+| IPlus : forall n, dinstr (S (S n)) (S n).
+(* =end= *)
+
+Definition _dinstr_HSet n m: IsHSet (dinstr n m).
+Admitted.
+
+Instance dinstr_HSet n m: IsHSet (dinstr n m) := _dinstr_HSet n m.  
+
+Definition Hdinstr n m := hset (dinstr n m).
+
+Arguments IConst {n} k.
+Arguments IPlus {n}.
 
 (** The stach machine satisfies those depth invariants **)
 
-Definition exec n n' (i : dinstr n n') : dstack n -> dstack n' :=
+(* =exec= *)
+Definition exec n m (i : Hdinstr n m): Hdstack n -> Hdstack m :=
   match i with
     | IConst n => fun s => (n, s)
     | IPlus => fun s =>
-                  let '(arg1, (arg2, s')) := s in (* note the direct pattern match *)
-                  (arg1 + arg2, s')
+                let '(arg1, (arg2, s)) := s in (arg1 + arg2, s)
   end.
+(* =end= *)
 
 
 Eval compute in exec 1 _ (IConst 1) (2,tt).
@@ -52,9 +78,11 @@ Eval compute in exec 2 _ IPlus (2, (1, tt)).
    and the condition is expressed with the [valid_instr] predicate
    below (which is decidable).  *)
 
+(* =instr= *)
 Inductive instr : Type :=
 | NConst : nat -> instr
 | NPlus  : instr.
+(* =end= *)
 
 Instance show_instr : Show instr :=
   {| show s := 
@@ -64,14 +92,16 @@ Instance show_instr : Show instr :=
        end
   |}.
 
-Definition instr_index n (i:instr) : Cast nat :=
+(* =instr_index= *)
+Definition instr_index n (i:instr) : TError Hnat _ :=
   match i with
-    | NConst _ => creturn (S n)
+    | NConst _ => Some (S n)
     | NPlus => match n with
-                 | S (S n) => creturn (S n)
-                 | _ => Fail _ (Cast_info_wrap "invalid instruction")
+                 | S (S n) => Some (S n)
+                 | _ => Fail (_with "invalid instruction")
                end
   end.
+(* =end= *)
 
 
 (** ** Equivalences *)
@@ -82,7 +112,7 @@ Definition instr_index n (i:instr) : Cast nat :=
 >> 
 *)
 
-Definition dstack_to_list {n} : dstack n -> {l : list nat & clift (info := Cast_info) (length (A:=nat)) l = Some n}.
+Definition dstack_to_list n : dstack n -> {l : list Hnat & clift (length (A:=nat)) l = Some n}.
   intro s; induction n.
   - exact (nil; eq_refl).
   - exists (fst s :: (IHn (snd s)).1). unfold clift. apply ap. simpl. apply ap. 
@@ -105,21 +135,25 @@ inversion_clear q; unfold clift, length; auto.
 Defined.
 *)
 
-Definition list_to_dstack {n} : {l : list nat & clift (info := Cast_info) (length (A:=nat)) l = Some n} -> dstack n.
+Definition list_to_dstack n : {l : list Hnat & clift (length (A:=nat)) l = Some n} -> dstack n.
   destruct 1 as [l H]. generalize dependent n; induction l; cbn in *; intros. 
   - inversion H. exact tt.
   - specialize (IHl (length l) eq_refl). inversion H. exact (a,IHl).
 Defined.
 
-Instance DepEquiv_dstack :
-  dstack ≈ (list nat) :=
-  @DepEquiv_eq _ _ (list nat) _ _ _ (clift (length (A:=nat))) (@dstack_to_list) (@list_to_dstack) _ _ _.
+Definition list A  `{DecidablePaths A} := {| _typeS := list A |} : HSet.
+
+(* =DepEquiv_dstack= *)
+Instance Coercion_dstack : Hdstack ≲K□ list Hnat :=
+  DepCoercion_eq Hdstack (list Hnat) (clift length)
+                 dstack_to_list list_to_dstack.
+(* =end= *)
 { unfold compose. intro n. 
   induction n; intro s; simpl. 
   - destruct s. reflexivity.
   - destruct s as [a s]. simpl. 
     specialize (IHn s). unfold compose in IHn. simpl in *.
-    destruct (dstack_to_list s). 
+    destruct (dstack_to_list _ s). 
     simpl in *. inversion e.
     assert (e = ap Some H0). apply is_hprop. subst. simpl in *.
     refine (path_prod_uncurried _ _ _); split; try reflexivity.
@@ -170,9 +204,9 @@ match x with (i;v) => match i return valid_instr i n n' → dinstr n n' with
   (* to provide : Some (S n) = Some n' => dinstr (S (S n)) n' *)
      | S (S n) => fun v => transport (fun X => dinstr _ X) (Some_inj v) (IPlus) end end v end.
 
-Instance DecidablePaths_instr : DecidablePaths instr.
-econstructor. intros x y. destruct x, y.
-- case (dec (n = n0)); intro e; subst. 
+Definition Decidable_eq_instr :  forall (x y : instr), (x = y) + not (x = y).
+intros x y. destruct x, y.
+- case (Decidable_eq_nat n n0); intro e; subst. 
   + exact (inl eq_refl).
   + apply inr. intro H. apply e. inversion H. reflexivity. 
 - apply inr. intro H; inversion H.
@@ -180,10 +214,18 @@ econstructor. intros x y. destruct x, y.
 - exact (inl eq_refl).   
 Defined.
 
-Definition transport_instr_Const (n m n0 : nat) (e : S n = m) :
-   dinstr_to_instr _ _
-     (transport (λ X : nat, dinstr n X) e (IConst n0)) =
-   (NConst n0; ap Some e).
+Instance IsHSet_instr : IsHSet instr := Hedberg Decidable_eq_instr.
+
+Instance DecidablePaths_instr : DecidablePaths (hset instr) := 
+  { dec_paths := Decidable_eq_instr }.
+
+
+(* Arguments dinstr_to_instr {_}{_} e. *)
+
+(* =transport_instr_Const= *)
+Definition transport_instr_Const (n m k : nat) (e : S n = m) :
+   dinstr_to_instr _ _ (e # (IConst k)) = (NConst k; ap Some e).
+(* =end= *)
      destruct e. reflexivity.
 Defined.
 
@@ -220,13 +262,13 @@ Definition DepEquiv_instr_retr n m (x:{i:instr & instr_index n i = Some m}) :
                                (NPlus; v) eq_refl (is_hprop _ _) end
             end v end.
 
-Instance DepEquiv_instr n :
-  (dinstr n) ≈ instr
-  :=
-    @DepEquiv_eq _ _ instr _ _ _
-                 (instr_index n)
-                 (dinstr_to_instr n) 
-                 (instr_to_dinstr n) _ _ _.
+Definition Hinstr := {| _typeS := instr |} : HSet.
+
+(* =DepEquiv_instr= *)
+Instance Coercion_instr n : Hdinstr n ≲K□ Hinstr :=
+  DepCoercion_eq (Hdinstr n) Hinstr (instr_index n)
+                 (dinstr_to_instr n) (instr_to_dinstr n).
+(* =end= *)
 {intros m x. destruct x; reflexivity. }
 { apply DepEquiv_instr_retr. }
 { intros m i. destruct n, i; cbn; reflexivity. }
@@ -236,51 +278,64 @@ Defined.
 
 (** Lifting exec to safely accept instr and list nat **)
 
-Definition simple_exec : instr → list nat ⇀ list nat := lift2 exec.
+(* =simple_exec= *)
 
-Arguments lift2 {_ _ _ _ _ _ _ _ } _ _ _ _.
+Definition simple_exec : instr → List.list nat ⇀ List.list nat.
+  refine (lift2 exec); typeclasses eauto.
+Defined.
+(* =end= *)
+
+Arguments lift2 {_ _ _ _ _ _ _ _ _ _ _} _.
 
 (* Pretty Printing of safe_exec *)
 
-Arguments HODepEquiv {_ _ _ _}  _ {_ _ _} _.
-Arguments HODepEquiv2 {_ _ _ _ _ _ _ _ _ _ _ _}  _ _.
-Arguments HODepEquiv2_sym {_ _ _ _ _ _ _ _ _ _ _} _. 
-
-(*
-Definition sanity_check : simple_exec =
-          fun  (i : instr) (l : list nat) =>
-          b <- (c' <- to_subset l; Some (list_to_dstack c'));
-          a <- instr_index (Datatypes.length l) i;
-          b0 <- (c' <- to_subset i;
-               Some (instr_to_dinstr (Datatypes.length l) a c'));
-          Some (dstack_to_list (exec (Datatypes.length l) a b0 b)) .1:=
-  eq_refl.
-*)
+(* Arguments HOCoercion {_ _ _} _ {_ _} _. *)
+Arguments HOCoercion_2 {_ _ _ _ _ _ _ _}  _ _.
+Arguments HOCoercion2_sym {_ _ _ _ _ _ _ _} _. 
+Print simple_exec. 
+  
+(* Definition sanity_check : simple_exec = *)
+(*                           fun  (i : instr) (l : list Hnat) =>                *)
+(*             b <- (c' <- to_subset l; Some (list_to_dstack c')); *)
+(*           a <- instr_index (Datatypes.length l) i; *)
+(*           b0 <- (c' <- to_subset i; *)
+(*                Some (instr_to_dinstr (Datatypes.length l) a c')); *)
+(*           Some (dstack_to_list _ (exec (Datatypes.length l) a b0 b)) .1:= *)
+(*   eq_refl. *)
 
 Eval compute in simple_exec NPlus (1 :: 2 :: nil).
 Eval compute in simple_exec NPlus (1 :: nil).
 
-(* Print Assumptions simple_exec. *)
+Print Assumptions simple_exec.
 
 (** ** Extraction *)
 
-Require Import ExtrOcamlString ExtrOcamlNatInt.
-Extract Inductive list => "list" [ "[]" "(::)" ].
+Extract Constant PartialOrderTError => "let f _  = Obj.magic 0 in f".
 
-Extraction "distack" cast_erasure exec simple_exec.
+Require Import ExtrOcamlString ExtrOcamlNatInt.
+Extract Inductive List.list => "list" [ "[]" "(::)" ].
+
+Extraction "didstack" exec simple_exec.
 
 (** 
 <<
-$ ocaml -init distack.ml
+$ ocaml -init didstack.ml
 # (exec 0 0 (IPlus 0) [1;2] : int list);;
 - : int list = [3]
 # exec 0 0 (IPlus 0) [];;
 Segmentation fault: 11 
+>>
+ *)
 
-# simple_exec NPlus [1;2];;
+(**
+<< 
+$ ocamlc didstack.mli didstack.ml
+# #load "didstack.cmo";;
+# open Didstack;;
+# (simple_exec NPlus [1;2] : int list) ;;
 - : int list = [3]                                                                              
-# simple_exec NPlus [];;
-Exception: (Failure "Cast failure: invalid instruction").   
+# (simple_exec NPlus [] : int list) ;;
+Exception: (Failure "Coercion failure: invalid instruction").   
 >>
  *)
 

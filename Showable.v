@@ -13,10 +13,10 @@ Local Open Scope string_scope.
 
 (** ** Default Instance: *)
 
-Definition not_implemented := "not implemented".
-Axiom show_not_implemented_for: forall (A: Type), string.
+(* Definition not_implemented := "not implemented". *)
+(* Axiom show_not_implemented_for: forall (A: Type), string. *)
       
-Instance show_default A : Show A | 1000 := {| show := fun _ => show_not_implemented_for A |}.
+(* Instance show_default A : Show A | 1000 := {| show := fun _ => show_not_implemented_for A |}. *)
 
 (** ** Instance for nat *)
 Instance show_nat : Show nat | 0 :=
