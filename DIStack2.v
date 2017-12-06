@@ -53,26 +53,9 @@ Instance IsHSet_stack_typ : IsHSet stack_typ := Hedberg Decidable_eq_stack_typ.
 Instance DecidablePaths_stack_typ : DecidablePaths (hset stack_typ) := 
   { dec_paths := Decidable_eq_stack_typ }.
 
-(*
-Lemma stack_eq_dec_refl : forall (S: stack_typ), dec (S = S) = inl eq_refl.
-intro S.
-destruct (dec (S = S)).
-destruct e.
-Admitted.
-*)
-(*
-Lemma stack_eq_decP : forall a b, stack_eq_dec a b = true -> a = b.
-Admitted.
-*)
 
 Section TypeScopeSection.
 Local Open Scope type.
-
-(*
-Inductive dstack : stack_typ -> Type :=
-| eps : dstack nil
-| cns : forall {T}{S}, sem T -> dstack S -> dstack (cons T S).
-*)
 
 (* =dstack= *)
 Fixpoint dstack (s: stack_typ) : Type :=
@@ -347,38 +330,6 @@ Fixpoint instr_to_dinstrH Sin Sout (i: instr) : valid_instr i Sin Sout -> dinstr
 Definition instr_to_dinstr Sin Sout : { i: instr & valid_instr i Sin Sout} -> dinstr Sin Sout := fun x => instr_to_dinstrH Sin Sout x.1 x.2.
 
 
-(*
-Fixpoint DecidablePaths_instr (a : instr) : forall b, Decidable (a = b).
-induction a; intro b; destruct b;
-  try exact (inl eq_refl);
-  try (apply inr; now inversion 1).
-- case (IHa1 b1).
-  + case (IHa2 b2).
-    * intros -> -> .
-      exact (inl eq_refl).
-    * intros; apply inr; inversion 1; contradiction.
-  + intros; apply inr; inversion 1; contradiction.
-- case (dec (T = T0)).
-  + intros <-.
-    destruct T.
-    * {
-        case (dec (s = s0)).
-        - intros ->.
-          exact (inl eq_refl).
-        - intro. apply inr. intro. apply n. inversion H.
-          admit. (* XXX: painful equality over sigma-type *)
-      }
-    * admit. (* XXX: copy/paste proof above *)
-  + intros. apply inr; inversion 1; contradiction.
-- case (IHa1 b1).
-  + case (IHa2 b2).
-    * intros -> -> .
-      exact (inl eq_refl).
-    * intros; apply inr; inversion 1; contradiction.
-  + intros; apply inr; inversion 1; contradiction.
-Admitted.
- *)
-
 Arguments dinstr_to_instr {_}{_} i.
 
 Definition transport_instr_Skip {S1 S2} (e : S1 = S2) :
@@ -387,15 +338,6 @@ Definition transport_instr_Skip {S1 S2} (e : S1 = S2) :
    (NSkip; ap Some e).
   destruct e; reflexivity.
 Defined.
-
-(*
-Definition transport_instr_Seq {S1 S2 c1 c2 i1 i2} (e : S1 = S2) :
-   dinstr_to_instr
-     (transport (λ X, dinstr S1 X) e (ISeq c1 c2)) =
-   (NSeq i1 i2; ap Some e).
-  destruct e; reflexivity.
-Defined.
-*)
 
 (* =transport_instr_Const= *)
 Definition transport_instr_PUSH {T S1 S2 k} (e : T :: S1 = S2) :

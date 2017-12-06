@@ -18,7 +18,7 @@ defined in this file are proof-relevant.
 (** ** Decidability *)
 
 (* =Decidable= *)
-Class Decidable (A : HProp) := dec : A + (not A).
+Class Decidable (A: HProp) := dec: A + (not A).
 (* =end= *)
 
 Arguments dec A {_}.
@@ -101,13 +101,15 @@ Defined.
  *)
 
 (* =Checkable= *)
-Class Checkable (A : HProp) :=
-  {
-    check : HProp;
-    check_dec : Decidable check ;
-    convert : check -> A
-  }.
+Class Checkable (A: HProp) := {
+    check: HProp;
+    check_dec: Decidable check ;
+    convert: check -> A
+}.
 (* =end= *)
+
+Arguments check _ {_}.
+
 
 (** A decidable type is checkable (over all its elements). *)
 
@@ -161,10 +163,20 @@ Defined.
 
 (** ***  Instances for bool *)
 
-Definition Decidable_eq_bool : forall (x y : bool), (x = y) + not (x = y).
-intros. destruct x, y; try (left ;reflexivity); 
-        try (right; intro H; inversion H).
-Defined.
+Definition absurd_eq_bool : not (true = false).
+Proof.
+  inversion 1.
+Defined. 
+
+(* =Decidable_eq_bool= *)
+Definition Decidable_eq_bool (x y : bool) : (x = y) + not (x = y) :=
+  match x,y with
+    true, true   => inl eq_refl
+  | false, false => inl eq_refl
+  | true, false  => inr absurd_eq_bool
+  | false, true  => inr (absurd_eq_bool ° inverse)
+  end.
+(* =end= *)
 
 Instance IsHSet_bool : IsHSet bool := Hedberg Decidable_eq_bool.
 
@@ -188,6 +200,8 @@ Instance IsHSet_nat : IsHSet nat := Hedberg Decidable_eq_nat.
 
 Instance DecidablePaths_nat : DecidablePaths (hset nat) := 
   { dec_paths := Decidable_eq_nat }.
+
+Definition Hnat : HSet := hset nat.
 
 (** *** Instances for list *)
 

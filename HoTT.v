@@ -24,18 +24,22 @@ Notation "{ x : A & P }" := (sigT (A:=A) (fun x => P)) : type_scope.
 Notation "x .1" := (projT1 x) (at level 3).
 Notation "x .2" := (projT2 x) (at level 3).
 Notation " ( x ; p ) " := (existT _ x p).
+Notation π1 := (@projT1 _ _). 
 
 (** * Pi type *)
 
-Notation "f == g" := (forall x, f x = g x) (at level 3).
+(* =funeq= *)
+Notation "f == g" := (forall x, f x = g x)
+(* =end= *)
+    (at level 3).
 
-Definition apD10 {A} {B:A -> Type} {f g: forall a, B a}(p: f = g): f == g := 
+Definition apD10 {A} {B:A -> Type} (f g: forall a, B a) (p: f = g): f == g := 
   match p with eq_refl => fun x => eq_refl end.
 
-Definition Funext := forall A (B:A -> Type) (f g: forall a, B a) ,
-    (f == g) -> f = g.
 
-Axiom funext : Funext. 
+Definition compose {A B C} : (A -> B) -> (B -> C) -> A -> C := fun f g x => g (f x).
+
+Notation "g ° f" := (compose f g) (at level 1).
 
 (** * Equality type *)
 
@@ -69,8 +73,8 @@ Definition inverse_left_inverse A (x y : A) (p : x = y) : eq_refl = (p ^ @ p) :=
 *)
 
 (* =transport= *)
-Definition transport {A : Type} (P : A -> Type) {x y : A} 
-    (p : x = y) (u : P x) : P y :=
+Definition transport {A: Type} (P: A -> Type) {x y: A} 
+    (p: x = y) (u: P x): P y :=
   match p with eq_refl => u end.
 Notation "p # x" := (transport _ p x)
 (* =end= *)
@@ -83,8 +87,11 @@ Definition ap_transport {A} {P Q : A -> Type} {x y : A}
 
 (** Equality structure over Pi types *)
 
-Definition ap {A B:Type} (f:A -> B) {x y:A} (p:x = y) : f x = f y := 
-  match p with eq_refl => eq_refl end.
+(* =ap= *)
+Definition ap {A B: Type} (f: A -> B) {x y: A} : x = y -> f x = f y.
+(* =end= *)
+  exact (fun p => match p with eq_refl => eq_refl end).
+Defined.
 
 Definition apD {A:Type} {B:A->Type} (f:forall a:A, B a) {x y:A} 
            (p:x=y): p # (f x) = f y :=
@@ -93,6 +100,59 @@ Definition apD {A:Type} {B:A->Type} (f:forall a:A, B a) {x y:A}
 Definition ap_compose {A B C : Type} (f : A -> B) (g : B -> C) {x y : A} 
            (p : x = y): ap (fun x => g (f x)) p = ap g (ap f p) :=
   match p with eq_refl => eq_refl end.
+
+
+(** * Equivalences (first-order) *)
+     
+(** ** Type equivalence *)
+
+(** The typeclass [IsEquiv] includes the data making [f] into an
+adjoint equivalence. *)
+
+(** From nlab [https://ncatlab.org/nlab/show/adjoint+equivalence], "an
+adjoint equivalence between categories is an adjunction [f ⊣ g] in which
+the unit [e_sect] and counit [e_retr] are natural isomorphisms." *)
+
+(** Here, the adjointness states that all the ways to go from [A] to
+[B] (and conversely) are strictly the same. *)
+
+(* Pierre: for strict accuracy, the counit [e_retr] should perhaps be
+defined in the other direction: [e_retr : id == f ° e_inv] I guess. *)
+
+Notation id := (fun x => x). 
+
+(* =IsEquiv= *)
+Class IsEquiv {A B: Type} (f: A -> B) := {
+  e_inv: B -> A ;
+  e_sect: e_inv ° f == id;
+  e_retr: f ° e_inv == id;
+  e_adj: forall x: A, e_retr (f x) = ap f (e_sect x)
+}.
+(* =end= *)
+
+Arguments e_inv {_ _} _ {_}.
+Arguments e_sect {_ _} _ {_} _.
+Arguments e_retr {_ _} _ {_} _.
+Arguments e_adj {_ _} _ {_} _.
+
+Definition Funext := forall A (B:A -> Type) (f g: forall a, B a) ,
+    IsEquiv (apD10 f g).
+
+Axiom funext : Funext. 
+
+(** A class that includes all the data of an adjoint equivalence. *)
+(* =Equiv= *)
+Record Equiv (A B: Type) := {
+    e_fun: A -> B ;
+    e_isequiv: IsEquiv e_fun
+}.
+Notation "A ≃ B" := (Equiv A B)
+(* =end= *)
+                      (at level 20).
+
+Arguments e_fun {_ _} _ _.
+Arguments e_isequiv {_ _ _}.
+
 
 (** Equality structure over Sigma types *)
 
@@ -181,7 +241,7 @@ Class Contr (A : Type) := BuildContr {
 (** ** HProp *)
 
 (* =IsHProp= *)
-Class IsHProp (T : Type) := is_hprop : forall x y: T, x = y.
+Class IsHProp (T: Type) := is_hprop: forall x y: T, x = y.
 (* =end= *)
 
 Arguments is_hprop {T} {_} x y.
@@ -324,7 +384,7 @@ Instance IsHProp_contr A `{IsHProp A} (x y : A) : Contr (x = y).
 Defined.
 
 (* =IsHSet= *)
-Class IsHSet A := is_hset :> forall a b: A, IsHProp (a = b).
+Class IsHSet A := is_hset:> forall a b: A, IsHProp (a = b).
 (* =end= *)
 
 Hint Extern 1 (IsHProp (?a = ?b)) => apply (is_hprop (IsHProp := is_hset a b)) : typeclass_instances.
@@ -376,16 +436,16 @@ Proof.
   apply is_hprop. apply is_hprop.
 Defined.
 
-Record HSet := hset
-  { _typeS :> Type;
+Record HSet := hset { 
+    _typeS :> Type;
     _isHSet : IsHSet _typeS
-  }.
+}.
 
 (* =HProp= *)
-Record HProp := hprop
-  { _typeP :> Type;
-    _isHProp : IsHProp _typeP
-  }.
+Record HProp := hprop {
+    _typeP:> Type;
+    _isHProp: IsHProp _typeP
+}.
 (* =end= *)
 
 Arguments hset _ {_}.
@@ -507,14 +567,6 @@ Proof.
   destruct p.  exact eq_refl.
 Defined.
 
-Lemma transport_funext {A B} (g g': A -> B)  {x : A} (e : forall x, g x = g' x)
-      P (f : P (g x)):
-  transport (fun G => P (G x)) (funext _ _ _ _ e) f =
-  transport (fun X => P X) (e x) f.
-Proof. 
-Admitted.
-
-
 Lemma transport_forall {A} B (g g': B) P {x : A} (e : g = g')
       (f : forall x, P g x)  :
   transport (fun G => forall x, P G x) e f x = transport (fun G => P G x) e (f x).
@@ -522,13 +574,48 @@ Proof.
   destruct e. simpl. reflexivity.
 Defined.
 
-
-Instance IsHSet_forall P (Q : P -> Type) 
- `{HQ : forall x, IsHSet (Q x)}
-(*----------------*) : 
-   IsHSet (forall x, Q x).
+(* =IsHSet_forall= *)
+Instance IsHSet_forall P (Q : P -> Type) `{HQ : forall x, IsHSet (Q x)}: IsHSet (forall x, Q x).
+(* =end= *)
 Proof.
   intros f g.
   assert (IsHProp (forall x, f x = g x)). typeclasses eauto.
-(* need a better statement of funext *)
-Admitted. 
+  intros e e'.
+  etransitivity. symmetry.
+  apply (@e_sect _ _ _ (funext _ _ f g)).
+  etransitivity. Focus 2. 
+  apply (@e_sect _ _ _ (funext _ _ f g)).
+  unfold compose. apply ap.
+  exact (H (apD10 f g e) (apD10 f g e')).
+Defined. 
+
+Definition moveR_equiv_M {A B f} `{IsEquiv A B f} (x : A) (y : B) (p : x = e_inv f y)
+  : (f x = y)
+  := ap f p @ e_retr f y.
+
+Lemma contr_equiv A {B} (f : A -> B) `{IsEquiv A B f} `{Contr A}
+  : Contr B.
+Proof.
+  refine (BuildContr _ (f center) _).
+  intro y. 
+  apply moveR_equiv_M. apply contr. 
+Qed.
+
+
+Instance IsHProp_compose A B (f : A -> B) P (H : forall b, IsHProp (P b)) a :
+  IsHProp (P (f a)) := H (f a).
+
+
+
+
+
+Instance HSet_HProp_Path A `{IsHSet A} : forall (a b : A), IsHProp (a = b) :=
+  fun a b => is_hprop (IsHProp := is_hset a b).
+
+Definition sigT_HSet (A:HSet) (P : A -> HProp) : HSet.
+Proof.
+  refine (hset (sigT P)).
+Defined. 
+
+
+  

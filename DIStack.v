@@ -16,7 +16,7 @@ Arguments length {_} l.
 Section TypeScopeSection.
 Local Open Scope type.
 (* =dstack= *)
-Fixpoint dstack (n : Hnat) : Type :=
+Fixpoint dstack (n: Hnat): Type :=
   match n with
     | O => unit 
     | S n' => nat * dstack n'
@@ -25,10 +25,19 @@ Fixpoint dstack (n : Hnat) : Type :=
 Local Close Scope type.
 End TypeScopeSection.
 
-Definition _dstack_HSet n : IsHSet (dstack n).
-Admitted.
 
-Instance dstack_HSet n : IsHSet (dstack n) := _dstack_HSet n.
+
+Definition Decidable_eq_dstack n : forall (x y : dstack n), (x = y) + not (x = y).
+  intros x y. induction n; cbn in *.
+  - left. destruct x, y; reflexivity.
+  - destruct x as (nx,x), y as (ny,y). case (Decidable_eq_nat nx ny).
+    + destruct 1. case (IHn x y).
+      * destruct 1. left. reflexivity.
+      * right. intro H. apply n0. inversion H. reflexivity.
+    + right. intro H. apply n0. inversion H. reflexivity.
+Defined. 
+
+Instance dstack_HSet n : IsHSet (dstack n) := Hedberg (Decidable_eq_dstack n).
 
 Definition Hdstack n := hset (dstack n).
 
@@ -36,15 +45,37 @@ Definition Hdstack n := hset (dstack n).
 effect on the depth of the dstack *)
 
 (* =dinstr= *)
-Inductive dinstr : Hnat -> Hnat -> Type :=
-| IConst : forall n, nat -> dinstr n (S n)
-| IPlus : forall n, dinstr (S (S n)) (S n).
+Inductive dinstr: Hnat -> Hnat -> Type :=
+| IConst: forall n, nat -> dinstr n (S n)
+| IPlus: forall n, dinstr (S (S n)) (S n).
 (* =end= *)
 
-Definition _dinstr_HSet n m: IsHSet (dinstr n m).
-Admitted.
+Definition SS_absurd {n :nat}: S (S n) = n -> empty. 
+Proof.
+  induction n. intro e; inversion e.
+  intro e. inversion e. exact (IHn H0).
+Defined. 
 
-Instance dinstr_HSet n m: IsHSet (dinstr n m) := _dinstr_HSet n m.  
+
+Definition Decidable_eq_dinstr n m n' m' (en : n = n') (em:m=m') :
+  forall (x : dinstr n m) (y: dinstr n' m'),
+    (transport (fun X => dinstr X _) en (transport (fun X => dinstr _ X) em x) = y) + not (transport (fun X => dinstr X _) en (transport (fun X => dinstr _ X) em x) = y).
+Proof.
+  intros x y. destruct x, y.
+- destruct en. assert (em = eq_refl). apply is_hprop. rewrite H. cbn. 
+  case (Decidable_eq_nat n0 n2); intro e; subst; cbn. 
+  + exact (inl eq_refl).
+  + apply inr. intro H. apply e. inversion H. reflexivity. 
+- pose (transport (fun X => S X = _) en em). clearbody e. cbn in e.
+  inversion e. destruct (SS_absurd H0).
+- apply inr. inversion em. subst. destruct (SS_absurd H0^).
+- inversion em. subst.
+  assert (em = eq_refl). apply is_hprop. rewrite H. cbn. clear H. 
+  assert (en = eq_refl). apply is_hprop. rewrite H. cbn. clear H. 
+  exact (inl eq_refl). 
+Defined.
+
+Instance dinstr_HSet n m: IsHSet (dinstr n m) := Hedberg (Decidable_eq_dinstr n m n m eq_refl eq_refl).
 
 Definition Hdinstr n m := hset (dinstr n m).
 
@@ -54,7 +85,7 @@ Arguments IPlus {n}.
 (** The stach machine satisfies those depth invariants **)
 
 (* =exec= *)
-Definition exec n m (i : Hdinstr n m): Hdstack n -> Hdstack m :=
+Definition exec n m (i: Hdinstr n m): Hdstack n -> Hdstack m :=
   match i with
     | IConst n => fun s => (n, s)
     | IPlus => fun s =>
@@ -79,9 +110,9 @@ Eval compute in exec 2 _ IPlus (2, (1, tt)).
    below (which is decidable).  *)
 
 (* =instr= *)
-Inductive instr : Type :=
-| NConst : nat -> instr
-| NPlus  : instr.
+Inductive instr: Type :=
+| NConst: nat -> instr
+| NPlus: instr.
 (* =end= *)
 
 Instance show_instr : Show instr :=
@@ -93,7 +124,7 @@ Instance show_instr : Show instr :=
   |}.
 
 (* =instr_index= *)
-Definition instr_index n (i:instr) : TError Hnat _ :=
+Definition instr_index n (i: instr): TError Hnat _ :=
   match i with
     | NConst _ => Some (S n)
     | NPlus => match n with
@@ -144,8 +175,8 @@ Defined.
 Definition list A  `{DecidablePaths A} := {| _typeS := list A |} : HSet.
 
 (* =DepEquiv_dstack= *)
-Instance Coercion_dstack : Hdstack ≲K□ list Hnat :=
-  DepCoercion_eq Hdstack (list Hnat) (clift length)
+Instance Connection_dstack: Hdstack ≲K□ list Hnat :=
+  DepConnection_eq Hdstack (list Hnat) (clift length)
                  dstack_to_list list_to_dstack.
 (* =end= *)
 { unfold compose. intro n. 
@@ -157,7 +188,6 @@ Instance Coercion_dstack : Hdstack ≲K□ list Hnat :=
     simpl in *. inversion e.
     assert (e = ap Some H0). apply is_hprop. subst. simpl in *.
     refine (path_prod_uncurried _ _ _); split; try reflexivity.
-    simpl. exact IHn. 
  }
 { - intros n [l e]. unfold compose.  generalize dependent n.
     induction l; intros. 
@@ -219,11 +249,10 @@ Instance IsHSet_instr : IsHSet instr := Hedberg Decidable_eq_instr.
 Instance DecidablePaths_instr : DecidablePaths (hset instr) := 
   { dec_paths := Decidable_eq_instr }.
 
-
 (* Arguments dinstr_to_instr {_}{_} e. *)
 
 (* =transport_instr_Const= *)
-Definition transport_instr_Const (n m k : nat) (e : S n = m) :
+Definition transport_instr_Const (n m k: nat) (e: S n = m) :
    dinstr_to_instr _ _ (e # (IConst k)) = (NConst k; ap Some e).
 (* =end= *)
      destruct e. reflexivity.
@@ -262,12 +291,93 @@ Definition DepEquiv_instr_retr n m (x:{i:instr & instr_index n i = Some m}) :
                                (NPlus; v) eq_refl (is_hprop _ _) end
             end v end.
 
+Definition instr_to_dinstr' n n' :
+  {i: instr & valid_instr i n n'} -> dinstr n n'.
+  destruct 1 as [[] e]; cbn in *.
+  - destruct (Some_inj e). exact (IConst n0).
+  - destruct n. inversion e.
+    destruct n. inversion e.
+    destruct (Some_inj e). exact IPlus. 
+Defined.
+
+Reset instr_to_dinstr'.
+
+(* =convoy_instr_to_dinstr= *)
+Definition instr_to_dinstr' n n' 
+    (iv: {i: instr & valid_instr i n n'}): dinstr n n' :=
+  match iv with 
+  | (i; v) => 
+    match i return (valid_instr i n n' -> dinstr n n') with
+    | NConst n0 => 
+      fun v => 
+        let e := Some_inj v in
+        match e in (_ = m) 
+              return (valid_instr (NConst n0) n m -> dinstr n m) 
+        with
+        | eq_refl => fun _ => IConst n0
+        end v
+    | NPlus => (* ... *)
+(* =end= *)
+      fun v => 
+        match n 
+              return (valid_instr NPlus n n' -> dinstr n n') 
+        with
+        | 0 => 
+          fun v => Fail_is_not_Some v
+        | S n => 
+          fun v => 
+            match n
+                  return (valid_instr NPlus (S n) n' -> dinstr (S n) n') 
+            with
+            | 0 => 
+              fun v => Fail_is_not_Some v
+            | S n => 
+              fun v => 
+                let e := Some_inj v in
+                match e in (_ = m) 
+                      return (valid_instr NPlus (S (S n)) m -> dinstr (S (S n)) m) 
+                with
+                | eq_refl => fun _ => IPlus
+                end v
+            end v
+        end v
+    end v
+  end.
+
+Definition DepEquiv_instr_retr' n m (x:{i:instr & instr_index n i = Some m}) :
+  (dinstr_to_instr _ _) ° (instr_to_dinstr' _ _) x = x.
+Proof. 
+  destruct x as [[] e]; unfold compose; cbn. 
+  - unshelve eapply path_sigma. cbn.
+    set (Some_inj e).
+    change ((dinstr_to_instr n m
+     (match
+        e0 in (_ = y) return (valid_instr (NConst n0) n y → dinstr n y)
+      with
+      | eq_refl => λ _ : valid_instr (NConst n0) n (S n), IConst n0
+      end e)) .1 = NConst n0).
+    clearbody e0. destruct e0. reflexivity.
+    apply (is_hprop _ _). 
+  - destruct n. inversion e.
+    destruct n; inversion e.
+    unshelve eapply path_sigma. cbn.
+    set (Some_inj e).
+    change ((dinstr_to_instr (S (S n)) m
+     (match
+        e0 in (_ = y)
+        return (valid_instr NPlus (S (S n)) y → dinstr (S (S n)) y)
+      with
+      | eq_refl => λ _ : valid_instr NPlus (S (S n)) (S n), IPlus
+      end e)) .1 = NPlus).
+    clearbody e0. destruct e0. reflexivity.
+    apply (is_hprop _ _). 
+Defined.
+  
 Definition Hinstr := {| _typeS := instr |} : HSet.
 
 (* =DepEquiv_instr= *)
-Instance Coercion_instr n : Hdinstr n ≲K□ Hinstr :=
-  DepCoercion_eq (Hdinstr n) Hinstr (instr_index n)
-                 (dinstr_to_instr n) (instr_to_dinstr n).
+Instance Connection_instr n: Hdinstr n ≲K□ Hinstr :=
+  DepConnection_eq (Hdinstr n) Hinstr (instr_index n) (dinstr_to_instr n) (instr_to_dinstr n).
 (* =end= *)
 {intros m x. destruct x; reflexivity. }
 { apply DepEquiv_instr_retr. }
@@ -279,9 +389,8 @@ Defined.
 (** Lifting exec to safely accept instr and list nat **)
 
 (* =simple_exec= *)
-
-Definition simple_exec : instr → List.list nat ⇀ List.list nat.
-  refine (lift2 exec); typeclasses eauto.
+Definition simple_exec: instr → List.list nat ⇀ List.list nat.
+  refine (lift2 exec). typeclasses eauto.
 Defined.
 (* =end= *)
 
@@ -289,10 +398,10 @@ Arguments lift2 {_ _ _ _ _ _ _ _ _ _ _} _.
 
 (* Pretty Printing of safe_exec *)
 
-(* Arguments HOCoercion {_ _ _} _ {_ _} _. *)
-Arguments HOCoercion_2 {_ _ _ _ _ _ _ _}  _ _.
-Arguments HOCoercion2_sym {_ _ _ _ _ _ _ _} _. 
-Print simple_exec. 
+(* Arguments HOConnection {_ _ _} _ {_ _} _. *)
+Arguments HOConnection_2 {_ _ _ _ _ _ _ _}  _ _.
+Arguments HOConnection_2_sym {_ _ _ _ _ _ _ _} _. 
+(* Print simple_exec.  *)
   
 (* Definition sanity_check : simple_exec = *)
 (*                           fun  (i : instr) (l : list Hnat) =>                *)
@@ -306,11 +415,13 @@ Print simple_exec.
 Eval compute in simple_exec NPlus (1 :: 2 :: nil).
 Eval compute in simple_exec NPlus (1 :: nil).
 
-Print Assumptions simple_exec.
+(* we only use istrunc_hprop and funext *)
+(* commented for compilation time *)
+(* Print Assumptions simple_exec. *)
 
 (** ** Extraction *)
 
-Extract Constant PartialOrderTError => "let f _  = Obj.magic 0 in f".
+Extract Constant IsPartialOrderTError => "let f _  = Obj.magic 0 in f".
 
 Require Import ExtrOcamlString ExtrOcamlNatInt.
 Extract Inductive List.list => "list" [ "[]" "(::)" ].
@@ -332,9 +443,9 @@ Segmentation fault: 11
 $ ocamlc didstack.mli didstack.ml
 # #load "didstack.cmo";;
 # open Didstack;;
-# (simple_exec NPlus [1;2] : int list) ;;
-- : int list = [3]                                                                              
-# (simple_exec NPlus [] : int list) ;;
+# simple_exec NPlus [1;2] ;;
+- : int list = [3]  
+# simple_exec NPlus [] ;;
 Exception: (Failure "Coercion failure: invalid instruction").   
 >>
  *)

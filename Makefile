@@ -1,15 +1,13 @@
-VFILES=CastMonad.v DIPop.v DIStack.v Decidable.v \
-	 DepEquiv.v Equiv.v HODepEquiv.v HoTT.v PreOrder.v\
-	 Showable.v Vector.v
+all: coqcompile 
 
-all: coqcompile doc
+coqcompile: Makefile.coq
+	$(MAKE) -f Makefile.coq
 
-coqcompile:
-	coq_makefile -R . "" *.v -o Makefile_coq
-	$(MAKE) -f Makefile_coq > /dev/null
+Makefile.coq: _CoqProject
+	$(COQBIN)coq_makefile -f _CoqProject -o Makefile.coq
 
 clean: 
-	$(MAKE) -f Makefile_coq clean
+	$(MAKE) -f Makefile.coq clean
 
 doc: $(VFILES)
 	mkdir -p html; \
@@ -17,7 +15,7 @@ doc: $(VFILES)
 	coqdoc --gallina -toc -interpolate -utf8 -html -R "." "" -d html $(VFILES)
 
 html:
-	$(MAKE) -f Makefile_coq html
+	$(MAKE) -f Makefile.coq html
 
 %.native: %.ml
 	ocamlbuild $@ 

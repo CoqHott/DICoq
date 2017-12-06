@@ -11,9 +11,9 @@ Set Implicit Arguments.
 
 
 (* =_Cast= *)
-Inductive TError A (info : HProp) :=
-  | Some : A -> TError A info
-  | Fail : info -> TError A info.
+Inductive TError A (info: HProp) :=
+  | Some: A -> TError A info
+  | Fail: info -> TError A info.
 (* =end= *)
 
 Arguments Some {_ _} _.
@@ -86,34 +86,36 @@ Definition Some_inj_eq {A} {x y :A} info (e:Some x= Some y) : ap (@Some _ _) (So
 
 (** ** Monadic operations *)
 
+(* =creturn= *)
 Definition creturn {A} : A ⇀ A := Some.
+(* =end= *)
 
 (* =clift= *)
-Definition clift A B : (A -> B) -> (A ⇀ B) :=
+Definition clift A B: (A -> B) -> (A ⇀ B) :=
   fun f a => creturn (f a).
 (* =end= *)
 
 Arguments clift {_ _} _ _.
 
 (* =cbind= *)
-Definition cbind A B {info} : 
-      (A -> TError B info) -> TError A info -> TError B info :=
-  fun f a => match a with 
+Definition cbind A B {info}: 
+  TError A info -> (A -> TError B info) -> TError B info :=
+  fun a f => match a with 
                Some a => f a
              | Fail i => Fail i
              end. 
-Notation "x <- e1 ; e2" := (cbind _ _ (fun x => e2) e1)
+Notation "x <- e1 ; e2" := (cbind _ _ e1 (fun x => e2))
 (* =end= *)
                             (right associativity, at level 60).
 
-Notation "x >>= f" := (cbind _ _ f x) (at level 50).
+Notation "x >>= f" := (cbind _ _ x f) (at level 50).
 
 (* =kleisliComp= *)
-Definition kleisliComp {A B C : Type} : (A ⇀ B) -> (B ⇀ C) -> (A ⇀ C) :=
+Definition kleisliComp {A B C: Type}: (A ⇀ B) -> (B ⇀ C) -> (A ⇀ C) :=
   fun f g a => b <- f a ; g b.
 Notation "g °° f" := (kleisliComp f g)
 (* =end= *)
- (at level 50).
+ (at level 1).
 
 Definition cbind_Some {A B} x (f:A ⇀ B) b :
   x >>= f = Some b -> {a:A & ((x = Some a) * (f a = Some b))%type}.
@@ -162,7 +164,7 @@ Example coercion_some : unit ⇀ bool := fun _ => Some true.
 Definition _with (s:string) : info_str := (tr s).
 
 (* =cast_bool= *)
-Example err : TError bool info_str := Fail (_with "coercion to bool").
+Example err: TError bool info_str := Fail (_with "coercion to bool").
 (* =end= *)
 
 Example use_bool (cb: TError bool info_str)  := cb >>= (fun b => creturn (andb b b)).
@@ -201,7 +203,7 @@ element is bottom while successful computations are compared by
 equality. *)
 
 (* =preordercast= *)
-Instance PartialOrderTError (A:HSet) : PartialOrder_pp (TError A info_str) :=
+Instance IsPartialOrderTError (A: HSet): IsPartialOrder_pp (TError A info_str) :=
   {| rel := fun a a' => @hprop (match a with
                      | Some _ => a = a'
                      | Fail _ => True
@@ -227,7 +229,7 @@ Defined.
 
 (** To avoid failure of evaluation of bot in ocaml code *)
 
-Extract Constant PartialOrderTError => "0".
+Extract Constant IsPartialOrderTError => "0".
 
 Instance TError_HSet A `{IsHSet A} : IsHSet (TError A info_str).
 intros.
@@ -246,7 +248,7 @@ destruct a as [a|]; destruct b as [b|];
   etransitivity; [|eauto].
   assert (e'': path_TError_inv e = path_TError_inv e') by apply is_hprop.
   destruct e''. reflexivity.
-Qed.
+Defined.
 
 Definition TError_HSet_preorder (A:HSet) : forall (x y : TError A info_str) (e e' : x ≼ y), e = e'.
 Proof. 
